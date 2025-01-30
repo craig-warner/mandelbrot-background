@@ -1,0 +1,8 @@
+Website = "https://github.com/craig-warner/mandelbrot-background"
+
+[Details]
+  Icon = "snap/gui/mandelbrot-background.png"
+  Name = "Mandelbrot Toy"
+  ID = "com.warnerbits.mandelbrotbackground"
+  Version = "1.0.0"
+  Build = 4
