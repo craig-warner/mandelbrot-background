@@ -42,4 +42,8 @@ Drag Mandelbrot_Background.apk to emulator icon
 # Intalling  
 1) sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-background
 
+# Constuction Notes
+1) go mod init
+2) go mod tidy
+
 
