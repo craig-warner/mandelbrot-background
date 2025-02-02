@@ -565,6 +565,8 @@ func (m *Mandel) CalcOneDot() {
 
 func (m *Mandel) AdvanceToNextDot() {
 	// FIXME
+	//fmt.Printf("AdvanceToNextDot %+v", m)
+	//fmt.Printf("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
 	if !m.up_to_date {
 		m.cur_x = (m.cur_x + m.cur_granularity) % m.size
 		if m.cur_x == 0 {
@@ -643,6 +645,7 @@ func (m *Mandel) DrawOneDot(px, py, w, h int) color.Color {
 	color_px := use_px - m.black_out_left + m.centering_left_adj
 	color_py := use_py - m.black_out_top + m.centering_top_adj
 
+	//fmt.Printf("DrawOne px:%d,py:%d,w:%d,h:%d", px, py, w, h)
 	// Black out or color
 	black_color := color.RGBA{0, 0, 0, 0xff}
 	if use_py < m.black_out_top {
@@ -715,17 +718,17 @@ func (m *Mandel) CalcBundleSize() int {
 }
 
 func (m *Mandel) UpdateSome() {
-
 	// Update one Dot and advance
 	bsize := m.CalcBundleSize()
 	for b := 0; b < bsize; b++ {
+		//	fmt.Printf("UpdateSome:b=%d,bsize=%d", b, bsize)
 		m.CalcOneDot()
 		m.AdvanceToNextDot()
 	}
 	// Stall longer for courser granularities
-	for d := 0; d < (101 - m.cur_draw_speed); d++ {
-		time.Sleep(time.Nanosecond * 100000)
-	}
+	//for d := 0; d < (101 - m.cur_draw_speed); d++ {
+	//	time.Sleep(time.Nanosecond * 100000)
+	//}
 }
 
 func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
@@ -1015,7 +1018,8 @@ func main() {
 	// Resize ignored by Mobile Platforms
 	// - Mobile platforms are always full screen
 	// - 27 is a hack determined by Ubuntu/Gnome
-	myWindow.Resize(fyne.NewSize(256, (256 + 27)))
+	//myWindow.Resize(fyne.NewSize(256, (256 + 27)))
+	myWindow.Resize(fyne.NewSize(512, (256 + 27)))
 
 	// Control Menu Set up
 	menuItemGenerate := fyne.NewMenuItem("Generate Background", func() {
@@ -1040,6 +1044,8 @@ func main() {
 
 	// Mandelbrot
 	myMandel := NewMandel()
+	myMandel.ResetSpan()
+	myMandel.ResetWindow(256, 256)
 
 	// Content
 
@@ -1120,8 +1126,10 @@ func main() {
 	colOneContent.Add(zoomPathText)
 
 	colTwoContent := container.New(layout.NewVBoxLayout())
-
+	previewText := canvas.NewText("Preview", color.Black)
 	myRaster := canvas.NewRasterWithPixels(myMandel.DrawOneDot)
+	myRaster.SetMinSize(fyne.NewSize(256, 256))
+	colTwoContent.Add(previewText)
 	colTwoContent.Add(myRaster)
 
 	topContent := container.New(layout.NewHBoxLayout())
@@ -1155,8 +1163,17 @@ func main() {
 
 	myWindow.SetContent(wholeContent)
 
-	//go func() {
-	//}()
+	go func() {
+		for {
+			//fmt.Println(myMandel)
+			if !myMandel.up_to_date {
+				myMandel.UpdateSome()
+				myRaster.Refresh()
+			} else {
+				time.Sleep(time.Nanosecond * 100000000)
+			}
+		}
+	}()
 
 	myWindow.ShowAndRun()
 }
