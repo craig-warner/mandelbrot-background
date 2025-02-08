@@ -251,17 +251,15 @@ JSON Structure
 */
 const (
 	all_template_str = `[
-		{ 
-			"version": "1.0",
-			"num_images": 17,
-			"rgb": "bgr",
-			"bits_per_color": 4,
-			"brightness_shift": 4,
-			"x_units": 8,
-			"y_units": 4,
-			"high_precision": false,
-			"images": [
-  				{ "side_size": 1, "bg_x": 0, "bg_y": 3 },
+		{ 	"version":"1.0",
+			"num_images":17,
+			"rgb":"bgr",
+			"bits_per_color":4,
+			"brightness_shift":4,
+			"x_units":8,
+			"y_units":4,
+			"high_precision":false,
+			"images": [ { "side_size": 1, "bg_x": 0, "bg_y": 3 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 2 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 1 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 0 },
@@ -280,8 +278,7 @@ const (
 				{ "side_size": 1, "bg_x": 7, "bg_y": 0 }
 			]
 		},
-		{
-    		"version": "1.0",
+		{ 	"version": "1.0",
     		"num_images": 17,
     		"rgb": "bgr",
     		"bits_per_color": 4,
@@ -309,8 +306,7 @@ const (
 				{ "side_size": 4, "bg_x": 4, "bg_y": 0 }
     		]
 		},
-		{
-			"version": "1.0",
+		{ 	"version": "1.0",
 			"num_images": 2,
 			"rgb": "bgr",
 			"bits_per_color": 4,
@@ -318,7 +314,7 @@ const (
 			"x_units": 2,
 			"y_units": 1,
 			"high_precision": false,
-			"images": [
+    		"images": [
 				{
 					"side_size": 1,
 					"bg_x": 0,
@@ -419,21 +415,21 @@ type Color struct {
 }
 
 type ImageTemplate struct {
-	side_size int
-	bg_x      int
-	bg_y      int
+	Side_size int `json:"side_size"`
+	Bg_x      int `json:"bg_x"`
+	Bg_y      int `json:"bg_y"`
 }
 
 type Template struct {
-	version          string
-	num_images       int
-	rgb              string
-	bits_per_color   int
-	brightness_shift int
-	x_units          int
-	y_units          int
-	high_precision   bool
-	images           []ImageTemplate
+	Version          string          `json:"version"`
+	Num_images       int             `json:"num_images"`
+	Rgb              string          `json:"rgb"`
+	Bits_per_color   int             `json:"bits_per_color"`
+	Brightness_shift int             `json:"brightness_shift"`
+	X_units          int             `json:"x_units"`
+	Y_units          int             `json:"y_units"`
+	High_precision   bool            `json:"high_precision"`
+	Images           []ImageTemplate `json:"images"`
 }
 
 type Background struct {
@@ -650,9 +646,6 @@ func (m *Mandel) DrawOneDot(px, py, w, h int) color.Color {
 	black_color := color.RGBA{0, 0, 0, 0xff}
 	if use_py < m.black_out_top {
 		// Top
-		return (black_color)
-	} else if use_py >= (m.black_out_top + m.size) {
-		// Bottom
 		return (black_color)
 	} else if use_px < m.black_out_left {
 		// Left
@@ -936,6 +929,7 @@ func NewMandel() Mandel {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
+	//fmt.Printf("colors: %+v", bg.templates)
 	//fmt.Println(m.all_color_names)
 	return m
 }
@@ -945,12 +939,13 @@ func NewMandel() Mandel {
  */
 
 func (bg *Background) TotalImages() int {
-	total_images := bg.templates[bg.template_num].num_images
+	total_images := bg.templates[bg.template_num].Num_images
 	return total_images
 }
 
 func (bg *Background) PathImageString() string {
 	str := fmt.Sprintf("Zoom Path Points Defined: %d (out of %d)", bg.image_defined, bg.TotalImages())
+	fmt.Printf("template num %d", bg.template_num)
 	return str
 }
 
@@ -1002,6 +997,7 @@ func NewBackground() Background {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
+	fmt.Printf("Templates: %+v", bg.templates)
 	return bg
 }
 
@@ -1010,6 +1006,10 @@ func NewBackground() Background {
  */
 
 func main() {
+
+	zoomPathString := "Empty"
+	zoomPathLabel := widget.NewLabel(zoomPathString)
+	colOneContent := container.New(layout.NewVBoxLayout())
 
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Mandelbrot Background")
@@ -1100,21 +1100,28 @@ func main() {
 	addImageBtn := widget.NewButton("Add Image", func() {
 		fmt.Println("Add Image")
 		bg.image_defined++
-		//zoomPathText.Text = bg.PathImageString()
+		zoomPathString = bg.PathImageString()
+		zoomPathLabel.SetText(zoomPathString)
+		fmt.Printf("zoomPathString: %d", bg.image_defined)
+		zoomPathLabel.Refresh()
 		// FIXME: Add Image
 	})
 	resetPathBtn := widget.NewButton("Reset", func() {
 		fmt.Println("Reset")
 		bg.image_defined = 0
 		//	FIXME: Reset
+		zoomPathString = bg.PathImageString()
+		zoomPathLabel.SetText(zoomPathString)
+		zoomPathLabel.Refresh()
 	})
 	addResetContent.Add(addImageBtn)
 	addResetContent.Add(resetPathBtn)
 
-	zoomPathText := canvas.NewText("Zoom Path Points Defined: 0", color.Black)
+	zoomPathString = bg.PathImageString()
+	zoomPathLabel.SetText(zoomPathString)
 
 	// Column One
-	colOneContent := container.New(layout.NewVBoxLayout())
+	//colOneContent := container.New(layout.NewVBoxLayout())
 	colOneContent.Add(selectBackgroundTemplateText)
 	colOneContent.Add(selectBackgroundTemplateChoices)
 	colOneContent.Add(selectDesktopSizeText)
@@ -1123,7 +1130,7 @@ func main() {
 	colOneContent.Add(selectColorPreferenceChoices)
 	colOneContent.Add(zoomContent)
 	colOneContent.Add(addResetContent)
-	colOneContent.Add(zoomPathText)
+	colOneContent.Add(zoomPathLabel)
 
 	colTwoContent := container.New(layout.NewVBoxLayout())
 	previewText := canvas.NewText("Preview", color.Black)
@@ -1140,6 +1147,7 @@ func main() {
 	bottomContent := container.New(layout.NewVBoxLayout())
 	generateBtn := widget.NewButton("Generate Background", func() {
 		fmt.Println("Generate Background")
+		//		bgi := NewBackgroundImage(bg)
 		// FIXME: Generate Background
 	})
 	backgroundGenerationProgressText := canvas.NewText("Background Generation Progress", color.Black)
