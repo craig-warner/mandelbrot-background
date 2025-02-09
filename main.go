@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	max_size = 10000
+	MAX_DISPLAY_SIZE = 10000
+	MAX_IMAGES       = 256
 )
 
 /*
@@ -435,11 +436,16 @@ type Background struct {
 	zoom_magnification int
 	zoom_in            bool
 	image_defined      int
+	cur_min_x          float64
+	cur_min_y          float64
+	cur_span           float64
 	all_min_x          []float64
 	all_min_y          []float64
 	all_span           []float64
 	templates          []Template
 	images             []Mandel
+	desktop_x_dots     []int
+	desktop_y_dots     []int
 }
 
 type Point struct {
@@ -559,7 +565,7 @@ func (m *Mandel) CalcOneDot() {
 func (m *Mandel) AdvanceToNextDot() {
 	// FIXME
 	//fmt.Printf("AdvanceToNextDot %+v", m)
-	//fmt.Printf("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
+	fmt.Printf("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
 	if !m.up_to_date {
 		m.cur_x = (m.cur_x + m.cur_granularity) % m.size
 		if m.cur_x == 0 {
@@ -586,7 +592,7 @@ func (m *Mandel) ResetSpan() {
 
 func (m *Mandel) ResetWindow(w, h int) {
 	// Check
-	if (w > max_size) || (h > max_size) {
+	if (w > MAX_DISPLAY_SIZE) || (h > MAX_DISPLAY_SIZE) {
 		fmt.Println("Monitor is too big")
 		panic(1)
 	}
@@ -705,6 +711,10 @@ func (m *Mandel) CalcBundleSize() int {
 		bsize = 4096 * 4
 	}
 	return bsize
+}
+
+func (m *Mandel) PercentCalced() float64 {
+	return (float64(m.cur_y) / float64(m.size))
 }
 
 func (m *Mandel) UpdateSome() {
@@ -893,34 +903,34 @@ func (m *Mandel) FrcRedraw() {
 }
 */
 
-func NewMandel(color_theme_num int) Mandel {
+func NewMandel(min_x, min_y, span float64, size, color_theme_num int) Mandel {
 	//	var lcl_all_colors []MandelColor
 	m := Mandel{
-		size:            256,
+		size:            size,
 		cur_x:           0,
 		cur_y:           0,
-		cur_granularity: 64,
+		cur_granularity: 1, // Go straight to highest resolution
 		up_to_date:      false,
 		// Math
 		//span:      3.0,
-		span:      3.0,
+		span:      span,
 		threshold: 1000.0,
 		//		min_x:     -1.0,
-		min_x: -1.0,
+		min_x: min_x,
 		//		max_x: 2.0,
 		//min_y: -1.5,
-		min_y: -1.5,
+		min_y: min_y,
 		//	max_y: 1.5,
 		//Window
-		cur_w: 256,
-		cur_h: 256,
+		cur_w: size,
+		cur_h: size,
 		// Color
 		cur_color_num: color_theme_num,
 	}
 	m.span_one_dot = m.span / float64(m.size)
-	m.tiles = make([][]Color, max_size)
-	for i := 0; i < max_size; i++ {
-		m.tiles[i] = make([]Color, max_size)
+	m.tiles = make([][]Color, MAX_DISPLAY_SIZE)
+	for i := 0; i < MAX_DISPLAY_SIZE; i++ {
+		m.tiles[i] = make([]Color, MAX_DISPLAY_SIZE)
 	}
 	err := json.Unmarshal([]byte(all_colors_str), &m.all_colors)
 	if err != nil {
@@ -943,6 +953,38 @@ func NewMandel(color_theme_num int) Mandel {
 /*
  * Background functions
  */
+
+func (bg *Background) PixelsPerUnit() int {
+	pixels_per_unit := 1
+	width := bg.desktop_x_dots[bg.desktop_num]
+	height := bg.desktop_y_dots[bg.desktop_num]
+	pixels_per_unit_x := int(width / bg.templates[bg.template_num].X_units)
+	pixels_per_unit_y := int(height / bg.templates[bg.template_num].Y_units)
+	if pixels_per_unit_x < pixels_per_unit_y {
+		// use x
+		pixels_per_unit = pixels_per_unit_x
+	} else {
+		pixels_per_unit = pixels_per_unit_y
+	}
+	return pixels_per_unit
+
+}
+
+func (bg *Background) CalcPadX() int {
+	width := bg.desktop_x_dots[bg.desktop_num]
+	pixels_per_unit := bg.PixelsPerUnit()
+	xunits := bg.templates[bg.template_num].X_units
+	xpad := int((width - xunits*pixels_per_unit) / 2) // Might be shifted left one pixel
+	return (xpad)
+}
+
+func (bg *Background) CalcPady() int {
+	height := bg.desktop_y_dots[bg.desktop_num]
+	pixels_per_unit := bg.PixelsPerUnit()
+	yunits := bg.templates[bg.template_num].Y_units
+	ypad := int((height - yunits*pixels_per_unit) / 2) // Might be shifted up one pixel
+	return (ypad)
+}
 
 func (bg *Background) TotalImages() int {
 	total_images := bg.templates[bg.template_num].Num_images
@@ -993,9 +1035,14 @@ func NewBackground() Background {
 		zoom_magnification: 1,
 		zoom_in:            true,
 		image_defined:      0,
-		//all_min_x: []float64
-		//all_min_y []float64
-		//all_span  []float64
+		cur_min_x:          -1.0,
+		cur_min_y:          -1.5,
+		cur_span:           3.0,
+	}
+	for i := 0; i < MAX_IMAGES; i++ {
+		bg.all_min_x = append(bg.all_min_x, float64(-1.0))
+		bg.all_min_y = append(bg.all_min_y, float64(-1.5))
+		bg.all_span = append(bg.all_span, float64(3.0))
 	}
 	// Read in all the templates
 	err := json.Unmarshal([]byte(all_template_str), &bg.templates)
@@ -1004,6 +1051,19 @@ func NewBackground() Background {
 		panic(1)
 	}
 	fmt.Printf("Templates: %+v", bg.templates)
+	// Read in Desktop size
+	err = json.Unmarshal([]byte(all_display_x_dots_str), &bg.desktop_x_dots)
+	if err != nil {
+		fmt.Printf("Unable to marshal JSON due to %s", err)
+		panic(1)
+	}
+	fmt.Printf("Templates: %+v", bg.desktop_x_dots)
+	err = json.Unmarshal([]byte(all_display_y_dots_str), &bg.desktop_y_dots)
+	if err != nil {
+		fmt.Printf("Unable to marshal JSON due to %s", err)
+		panic(1)
+	}
+	fmt.Printf("Templates: %+v", bg.desktop_y_dots)
 	return bg
 }
 
@@ -1049,7 +1109,7 @@ func main() {
 	bg := NewBackground()
 
 	// Mandelbrot
-	myMandel := NewMandel(0)
+	myMandel := NewMandel(-1.0, -1.5, 3.0, 256, 0)
 	myMandel.ResetSpan()
 	myMandel.ResetWindow(256, 256)
 	// Raster
@@ -1118,12 +1178,30 @@ func main() {
 
 	addResetContent := container.New(layout.NewHBoxLayout())
 	addImageBtn := widget.NewButton("Add Image", func() {
+		// Check
+		if bg.image_defined >= bg.TotalImages() {
+			fmt.Println("Too many images defined")
+			var popup *widget.PopUp
+			all_defined_label := widget.NewLabel("All Images Already Defined")
+			popUpContent := container.NewVBox(
+				all_defined_label,
+				widget.NewButton("Ok", func() {
+					popup.Hide()
+				}),
+			)
+			popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+			popup.Show()
+			return
+		}
 		fmt.Println("Add Image")
 		bg.image_defined++
 		zoomPathString = bg.PathImageString()
 		zoomPathLabel.SetText(zoomPathString)
-		fmt.Printf("zoomPathString: %d", bg.image_defined)
 		zoomPathLabel.Refresh()
+		bg.all_min_x[bg.image_defined] = myMandel.min_x
+		bg.all_min_y[bg.image_defined] = myMandel.min_y
+		bg.all_span[bg.image_defined] = myMandel.span
+		fmt.Printf("zoomPathString: %d", bg.image_defined)
 		// FIXME: Add Image
 	})
 	resetPathBtn := widget.NewButton("Reset", func() {
@@ -1167,22 +1245,46 @@ func main() {
 
 	bottomContent := container.New(layout.NewVBoxLayout())
 	generateBtn := widget.NewButton("Generate Background", func() {
+		// Check
+		if bg.image_defined != bg.TotalImages() {
+			fmt.Println("Location for all images is not defined")
+			var popup *widget.PopUp
+			all_defined_label := widget.NewLabel("Location for all images is not defined")
+			popUpContent := container.NewVBox(
+				all_defined_label,
+				widget.NewButton("Ok", func() {
+					popup.Hide()
+				}),
+			)
+			popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+			popup.Show()
+			return
+		}
 		fmt.Println("Generate Background")
-		// Draw mandelborts
+		// Draw mandelbrots
 		for i_num := 0; i_num < bg.TotalImages(); i_num++ {
 			// Generate a Mandelbrot
 			imageGenerationProgressBar.SetValue(float64(0))
-			new_mandelbrot := NewMandel(bg.color_theme_num)
-			for i := 0; i < 100; i++ {
-				//new_mandelbrot.DrawSome()
-				imageGenerationProgressBar.SetValue(float64(i) / float64(100-1))
+			new_mandelbrot := NewMandel(
+				bg.all_min_x[i_num],
+				bg.all_min_y[i_num],
+				bg.all_span[i_num],
+				bg.templates[bg.template_num].Images[i_num].Side_size*bg.PixelsPerUnit(),
+				bg.color_theme_num,
+			)
+			for {
+				imageGenerationProgressBar.SetValue(new_mandelbrot.PercentCalced())
+				if new_mandelbrot.up_to_date {
+					break
+				} else {
+					fmt.Print(".")
+					new_mandelbrot.UpdateSome()
+				}
 			}
 			bg.images = append(bg.images, new_mandelbrot)
 			// update progress bar
 			backgroundGenerationProgressBar.SetValue(float64(i_num) / float64(bg.TotalImages()-1))
 		}
-
-		// o
 		//		bgi := NewBackgroundImage(bg)
 		// FIXME: Generate Background
 	})
