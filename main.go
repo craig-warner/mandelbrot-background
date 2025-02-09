@@ -9,9 +9,6 @@ import (
 	//	"github.com/hjson/hjson-go/v4"
 	"encoding/json"
 
-	"math"
-	"math/rand"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
@@ -388,24 +385,23 @@ type Mandel struct {
 	black_out_top, black_out_left         int
 	centering_top_adj, centering_left_adj int
 	// Colors
-	all_colors      []MandelColor
-	all_color_names []string
-	cur_color_num   int
-	new_color_num   int
-	// Zoom Tap
-	cur_zoom float64
-	new_zoom float64
+	cur_color_num int
+	all_colors    []MandelColor
+	//	cur_zoom float64
+	//	new_zoom float64
+	//
 	// Roam
-	cur_roam_speed       int // 1 to 100 (fast)
-	new_roam_speed       int
-	cur_draw_speed       int
-	new_draw_speed       int
-	cur_pan_total_steps  int
-	cur_zoom_total_steps int
-	roam_tgt_x           float64
-	roam_tgt_y           float64
-	roam_tgt_span_adj    float64 // 0.1-0.99
-	roam_step            int
+	//
+	//	cur_roam_speed       int // 1 to 100 (fast)
+	//	new_roam_speed       int
+	//	cur_draw_speed       int
+	//	new_draw_speed       int
+	//	cur_pan_total_steps  int
+	//	cur_zoom_total_steps int
+	//	roam_tgt_x           float64
+	//	roam_tgt_y           float64
+	//	roam_tgt_span_adj    float64 // 0.1-0.99
+	//	roam_step            int
 }
 
 type Color struct {
@@ -443,6 +439,7 @@ type Background struct {
 	all_min_y          []float64
 	all_span           []float64
 	templates          []Template
+	images             []Mandel
 }
 
 type Point struct {
@@ -724,6 +721,12 @@ func (m *Mandel) UpdateSome() {
 	//}
 }
 
+func (m *Mandel) SetColorTheme(color_theme_num int) {
+	m.up_to_date = false
+	m.cur_color_num = color_theme_num
+}
+
+/*
 func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
 
 	new_span := 3.0
@@ -747,7 +750,6 @@ func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
 	f64_lower_left_iters := float64(lower_left_iters)
 	f64_lower_right_iters := float64(lower_right_iters)
 
-	/*
 		fmt.Println(upper_left_pnt)
 		fmt.Println(upper_left_iters)
 		fmt.Println(upper_right_pnt)
@@ -756,7 +758,6 @@ func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
 		fmt.Println(lower_left_iters)
 		fmt.Println(lower_right_pnt)
 		fmt.Println(lower_right_iters)
-	*/
 
 	same_cnt := 0
 	if upper_left_iters == upper_right_iters {
@@ -797,12 +798,15 @@ func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
 		return true
 	}
 }
-
+*/
+/*
 func RoamCalcDistance(x, y float64) float64 {
 	distance := math.Sqrt(x*x + y*y)
 	return (distance)
 }
+*/
 
+/*
 // Must not be in center
 func (m *Mandel) RoamTgtScreenOne(x, y float64) bool {
 	distance := RoamCalcDistance(x, y)
@@ -887,8 +891,9 @@ func (m *Mandel) FrcRedraw() {
 	m.up_to_date = false
 	m.cur_granularity = 64
 }
+*/
 
-func NewMandel() Mandel {
+func NewMandel(color_theme_num int) Mandel {
 	//	var lcl_all_colors []MandelColor
 	m := Mandel{
 		size:            256,
@@ -910,6 +915,7 @@ func NewMandel() Mandel {
 		cur_w: 256,
 		cur_h: 256,
 		// Color
+		cur_color_num: color_theme_num,
 	}
 	m.span_one_dot = m.span / float64(m.size)
 	m.tiles = make([][]Color, max_size)
@@ -924,11 +930,11 @@ func NewMandel() Mandel {
 	//fmt.Println(m.all_colors)
 	//fmt.Println("extra",lcl_all_colors[0].Ibits)
 	//fmt.Println("extra",lcl_all_colors[0].Blue_pos)
-	err = json.Unmarshal([]byte(all_color_names_str), &m.all_color_names)
-	if err != nil {
-		fmt.Printf("Unable to marshal JSON due to %s", err)
-		panic(1)
-	}
+	//err = json.Unmarshal([]byte(all_color_names_str), &m.all_color_names)
+	//if err != nil {
+	//	fmt.Printf("Unable to marshal JSON due to %s", err)
+	//	panic(1)
+	//}
 	//fmt.Printf("colors: %+v", bg.templates)
 	//fmt.Println(m.all_color_names)
 	return m
@@ -1043,9 +1049,11 @@ func main() {
 	bg := NewBackground()
 
 	// Mandelbrot
-	myMandel := NewMandel()
+	myMandel := NewMandel(0)
 	myMandel.ResetSpan()
 	myMandel.ResetWindow(256, 256)
+	// Raster
+	myRaster := canvas.NewRasterWithPixels(myMandel.DrawOneDot)
 
 	// Content
 
@@ -1055,11 +1063,17 @@ func main() {
 		fmt.Println("Select Background Template Callback:", s)
 		for i := 0; i < len(selectBackgroundTemplateChoicesStrings); i++ {
 			if selectBackgroundTemplateChoicesStrings[i] == s {
+				// New Template
 				bg.template_num = i
+				bg.image_defined = 0
+				zoomPathString = bg.PathImageString()
+				zoomPathLabel.SetText(zoomPathString)
 				break
 			}
 		}
 	})
+	selectBackgroundTemplateChoices.SetSelectedIndex(0)
+
 	selectDesktopSizeText := canvas.NewText("Select your desktop size ", color.Black)
 	selectDesktopSizeChoicesStrings := bg.GetDesktopChiocesStrings()
 	selectDesktopSizeChoices := widget.NewSelect(selectDesktopSizeChoicesStrings, func(s string) {
@@ -1071,6 +1085,8 @@ func main() {
 			}
 		}
 	})
+	selectDesktopSizeChoices.SetSelectedIndex(0)
+
 	selectColorPreferenceText := canvas.NewText("Select your color preference", color.Black)
 	selectColorPreferenceChoicesStrings := bg.GetColorChiocesStrings()
 	selectColorPreferenceChoices := widget.NewSelect(selectColorPreferenceChoicesStrings, func(s string) {
@@ -1078,10 +1094,14 @@ func main() {
 		for i := 0; i < len(selectColorPreferenceChoicesStrings); i++ {
 			if selectColorPreferenceChoicesStrings[i] == s {
 				bg.color_theme_num = i
+				myMandel.SetColorTheme(bg.color_theme_num)
+				myRaster.Refresh()
 				break
 			}
 		}
 	})
+	selectColorPreferenceChoices.SetSelectedIndex(0)
+
 	zoomMagnificationText := canvas.NewText("Zoom in Magnification (1x to 10x)", color.Black)
 
 	zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
@@ -1109,7 +1129,6 @@ func main() {
 	resetPathBtn := widget.NewButton("Reset", func() {
 		fmt.Println("Reset")
 		bg.image_defined = 0
-		//	FIXME: Reset
 		zoomPathString = bg.PathImageString()
 		zoomPathLabel.SetText(zoomPathString)
 		zoomPathLabel.Refresh()
@@ -1134,7 +1153,6 @@ func main() {
 
 	colTwoContent := container.New(layout.NewVBoxLayout())
 	previewText := canvas.NewText("Preview", color.Black)
-	myRaster := canvas.NewRasterWithPixels(myMandel.DrawOneDot)
 	myRaster.SetMinSize(fyne.NewSize(256, 256))
 	colTwoContent.Add(previewText)
 	colTwoContent.Add(myRaster)
@@ -1144,19 +1162,35 @@ func main() {
 	topContent.Add(colTwoContent)
 
 	// Botton Content Creation
+	imageGenerationProgressBar := widget.NewProgressBar()
+	backgroundGenerationProgressBar := widget.NewProgressBar()
+
 	bottomContent := container.New(layout.NewVBoxLayout())
 	generateBtn := widget.NewButton("Generate Background", func() {
 		fmt.Println("Generate Background")
+		// Draw mandelborts
+		for i_num := 0; i_num < bg.TotalImages(); i_num++ {
+			// Generate a Mandelbrot
+			imageGenerationProgressBar.SetValue(float64(0))
+			new_mandelbrot := NewMandel(bg.color_theme_num)
+			for i := 0; i < 100; i++ {
+				//new_mandelbrot.DrawSome()
+				imageGenerationProgressBar.SetValue(float64(i) / float64(100-1))
+			}
+			bg.images = append(bg.images, new_mandelbrot)
+			// update progress bar
+			backgroundGenerationProgressBar.SetValue(float64(i_num) / float64(bg.TotalImages()-1))
+		}
+
+		// o
 		//		bgi := NewBackgroundImage(bg)
 		// FIXME: Generate Background
 	})
 	backgroundGenerationProgressText := canvas.NewText("Background Generation Progress", color.Black)
-	backgroundGenerationProgressBar := widget.NewProgressBar()
 	backgroundProgrogressContent := container.New(layout.NewHBoxLayout())
 	backgroundProgrogressContent.Add(backgroundGenerationProgressText)
 	backgroundProgrogressContent.Add(backgroundGenerationProgressBar)
 	imageGenerationProgressText := canvas.NewText("Image Generation Progress", color.Black)
-	imageGenerationProgressBar := widget.NewProgressBar()
 	imageGenerationProgrogressContent := container.New(layout.NewHBoxLayout())
 	imageGenerationProgrogressContent.Add(imageGenerationProgressText)
 	imageGenerationProgrogressContent.Add(imageGenerationProgressBar)
