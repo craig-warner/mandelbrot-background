@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"os"
 	"time"
@@ -694,6 +695,12 @@ func (m *Mandel) Status() {
 }
 
 func (m *Mandel) CalcBundleSize() int {
+	bsize := 16
+	return bsize
+}
+
+/*
+func (m *Mandel) CalcBundleSize() int {
 	bsize := 0
 	if m.cur_granularity == 64 {
 		bsize = 4
@@ -712,6 +719,7 @@ func (m *Mandel) CalcBundleSize() int {
 	}
 	return bsize
 }
+*/
 
 func (m *Mandel) PercentCalced() float64 {
 	return (float64(m.cur_y) / float64(m.size))
@@ -734,6 +742,10 @@ func (m *Mandel) UpdateSome() {
 func (m *Mandel) SetColorTheme(color_theme_num int) {
 	m.up_to_date = false
 	m.cur_color_num = color_theme_num
+}
+
+func (m *Mandel) FetchOnePoint(px, py int) (r, g, b uint8) {
+	return m.tiles[px][py].red, m.tiles[px][py].green, m.tiles[px][py].blue
 }
 
 /*
@@ -1068,6 +1080,41 @@ func NewBackground() Background {
 }
 
 /*
+ * Basic Image Functions
+ */
+func TranferMandelToImage(new_mandelbrot Mandel, mbg_image *image.RGBA, pos_x, pos_y int) {
+	for px := 0; px < new_mandelbrot.size; px++ {
+		for py := 0; py < new_mandelbrot.size; py++ {
+			red, green, blue := new_mandelbrot.FetchOnePoint(px, py)
+			mbg_image.Set(pos_x+px, pos_y+py, color.RGBA{red, green, blue, 0xff})
+		}
+	}
+}
+
+/*
+func encodeImage(filename string, img image.Image, format string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	//switch format {
+	//case "bmp":
+		//		return bmp.Encode(file, img, nil)
+		//	case "jpeg", "jpg":
+		//		return jpeg.Encode(file, img, nil)
+		//	case "png":
+		//		return png.Encode(file, img)
+		//	case "gif":
+		//		return gif.Encode(file, img, nil)
+	//default:
+	//	return fmt.Errorf("unsupported format: %s", format)
+	//}
+}
+*/
+
+/*
  * Main
  */
 
@@ -1169,12 +1216,14 @@ func main() {
 		fmt.Println("Zoom Magnification Callback:", f)
 		bg.zoom_magnification = int(f)
 	}
-	zoomInText := canvas.NewText("Zoom in", color.Black)
+	//zoomInText := canvas.NewText("Zoom in", color.Black)
 	zoomInCheckBox := widget.NewCheck("Zoom In", func(b bool) {
 		fmt.Println("Zoom In Callback:", b)
 		bg.zoom_in = b
 	})
-	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomInText, zoomInCheckBox)
+	zoomInCheckBox.SetChecked(true)
+	//zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomInText, zoomInCheckBox)
+	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomInCheckBox)
 
 	addResetContent := container.New(layout.NewHBoxLayout())
 	addImageBtn := widget.NewButton("Add Image", func() {
@@ -1261,6 +1310,7 @@ func main() {
 			return
 		}
 		fmt.Println("Generate Background")
+		mbg_image := image.NewRGBA(image.Rect(0, 0, bg.desktop_x_dots[bg.desktop_num], bg.desktop_y_dots[bg.desktop_num]))
 		// Draw mandelbrots
 		for i_num := 0; i_num < bg.TotalImages(); i_num++ {
 			// Generate a Mandelbrot
@@ -1282,11 +1332,46 @@ func main() {
 				}
 			}
 			bg.images = append(bg.images, new_mandelbrot)
+
+			pixels_per_unit := bg.PixelsPerUnit()
+			// Calculate the padx and pady
+			padx := bg.CalcPadX()
+			pady := bg.CalcPady()
+			// Calculate the x and y units
+			pos_x := bg.templates[bg.template_num].Images[i_num].Bg_x*pixels_per_unit + padx
+			pos_y := bg.templates[bg.template_num].Images[i_num].Bg_y*pixels_per_unit + pady
+			TranferMandelToImage(new_mandelbrot, mbg_image, pos_x, pos_y)
 			// update progress bar
 			backgroundGenerationProgressBar.SetValue(float64(i_num) / float64(bg.TotalImages()-1))
 		}
-		//		bgi := NewBackgroundImage(bg)
-		// FIXME: Generate Background
+		// Save the image
+		//filename_save := bg.templates[bg.template_num].Name + ".bmp"
+		//default_file_name_save := "mbg"+ ".bmp"
+		file_name_save := dialog.NewFileSave(func(uc fyne.URIWriteCloser, err error) {
+			if err != nil {
+				fmt.Println("Error in Save")
+				return
+			}
+
+			// FIXME Handle Cancel
+
+			// save file
+			//os.WriteFile(uc.URI().Path(), bmp.Encode(mbg_image), 0644)
+			os.WriteFile(uc.URI().Path(), []byte{0xff}, 0644)
+
+			//win.SetTitle(win.Title() + " - " + write.URI().Name())
+
+			//defer uc.Close()
+			// Save the image
+			//err = bmp.Encode(uc, mbg_image)
+			//if err != nil {
+			//	fmt.Println("Error in Save")
+			//	return
+			//}
+		}, myWindow)
+		file_name_save.SetFileName("mbg.bmp")
+		file_name_save.SetOnClosed(func() { fmt.Println("Save Closed") })
+		file_name_save.Show()
 	})
 	backgroundGenerationProgressText := canvas.NewText("Background Generation Progress", color.Black)
 	backgroundProgrogressContent := container.New(layout.NewHBoxLayout())
