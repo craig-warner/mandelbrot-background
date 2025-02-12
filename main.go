@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"image/color"
+	"image/png"
 	"os"
 	"time"
 
@@ -377,7 +379,6 @@ type Mandel struct {
 	cur_granularity int
 	tiles           [][]Color
 	// Math
-	//iterations int // Defined by Color
 	threshold    float64
 	span         float64
 	span_one_dot float64
@@ -389,21 +390,6 @@ type Mandel struct {
 	// Colors
 	cur_color_num int
 	all_colors    []MandelColor
-	//	cur_zoom float64
-	//	new_zoom float64
-	//
-	// Roam
-	//
-	//	cur_roam_speed       int // 1 to 100 (fast)
-	//	new_roam_speed       int
-	//	cur_draw_speed       int
-	//	new_draw_speed       int
-	//	cur_pan_total_steps  int
-	//	cur_zoom_total_steps int
-	//	roam_tgt_x           float64
-	//	roam_tgt_y           float64
-	//	roam_tgt_span_adj    float64 // 0.1-0.99
-	//	roam_step            int
 }
 
 type Color struct {
@@ -564,9 +550,9 @@ func (m *Mandel) CalcOneDot() {
 }
 
 func (m *Mandel) AdvanceToNextDot() {
-	// FIXME
+	// DEBUG
 	//fmt.Printf("AdvanceToNextDot %+v", m)
-	fmt.Printf("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
+	//fmt.Printf("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
 	if !m.up_to_date {
 		m.cur_x = (m.cur_x + m.cur_granularity) % m.size
 		if m.cur_x == 0 {
@@ -1311,6 +1297,12 @@ func main() {
 		}
 		fmt.Println("Generate Background")
 		mbg_image := image.NewRGBA(image.Rect(0, 0, bg.desktop_x_dots[bg.desktop_num], bg.desktop_y_dots[bg.desktop_num]))
+		fmt.Println("Making Black")
+		for px := 0; px < bg.desktop_x_dots[bg.desktop_num]; px++ {
+			for py := 0; py < bg.desktop_y_dots[bg.desktop_num]; py++ {
+				mbg_image.Set(px, py, color.RGBA{0x0, 0x0, 0x0, 0xff})
+			}
+		}
 		// Draw mandelbrots
 		for i_num := 0; i_num < bg.TotalImages(); i_num++ {
 			// Generate a Mandelbrot
@@ -1327,7 +1319,7 @@ func main() {
 				if new_mandelbrot.up_to_date {
 					break
 				} else {
-					fmt.Print(".")
+					//fmt.Print(".")
 					new_mandelbrot.UpdateSome()
 				}
 			}
@@ -1346,18 +1338,30 @@ func main() {
 		}
 		// Save the image
 		//filename_save := bg.templates[bg.template_num].Name + ".bmp"
-		//default_file_name_save := "mbg"+ ".bmp"
+		//default_file_name_save := "mbg"+ ".png"
 		file_name_save := dialog.NewFileSave(func(uc fyne.URIWriteCloser, err error) {
 			if err != nil {
 				fmt.Println("Error in Save")
 				return
 			}
 
-			// FIXME Handle Cancel
+			if uc == nil {
+				// user canceled
+				return
+			}
+
+			buf := new(bytes.Buffer)
+			err_png := png.Encode(buf, mbg_image)
+			png_bytes := buf.Bytes()
+			if err_png != nil {
+				fmt.Println("Error in Save: Converting")
+				return
+			}
 
 			// save file
 			//os.WriteFile(uc.URI().Path(), bmp.Encode(mbg_image), 0644)
-			os.WriteFile(uc.URI().Path(), []byte{0xff}, 0644)
+			//os.WriteFile(uc.URI().Path(), []byte{0xff}, 0644)
+			os.WriteFile(uc.URI().Path(), png_bytes, 0644)
 
 			//win.SetTitle(win.Title() + " - " + write.URI().Name())
 
@@ -1369,7 +1373,7 @@ func main() {
 			//	return
 			//}
 		}, myWindow)
-		file_name_save.SetFileName("mbg.bmp")
+		file_name_save.SetFileName("mbg.png")
 		file_name_save.SetOnClosed(func() { fmt.Println("Save Closed") })
 		file_name_save.Show()
 	})
