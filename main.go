@@ -423,16 +423,17 @@ type Background struct {
 	zoom_magnification int
 	zoom_in            bool
 	image_defined      int
-	cur_min_x          float64
-	cur_min_y          float64
-	cur_span           float64
-	all_min_x          []float64
-	all_min_y          []float64
-	all_span           []float64
-	templates          []Template
-	images             []Mandel
-	desktop_x_dots     []int
-	desktop_y_dots     []int
+	//	cur_min_x          float64
+	//	cur_min_y          float64
+	//	cur_span           float64
+	pan_speed      float64
+	all_min_x      []float64
+	all_min_y      []float64
+	all_span       []float64
+	templates      []Template
+	images         []Mandel
+	desktop_x_dots []int
+	desktop_y_dots []int
 }
 
 type Point struct {
@@ -734,6 +735,25 @@ func (m *Mandel) FetchOnePoint(px, py int) (r, g, b uint8) {
 	return m.tiles[px][py].red, m.tiles[px][py].green, m.tiles[px][py].blue
 }
 
+func (m *Mandel) AdjustPreview(delta_x, delta_y, delta_span float64) {
+	m.min_x += delta_x
+	m.min_y += delta_y
+	m.AdjustZoom(delta_span)
+	m.up_to_date = false
+}
+
+func (m *Mandel) AdjustZoom(adj float64) {
+	center_x := m.min_x + (m.span / 2.0)
+	center_y := m.min_y + (m.span / 2.0)
+	fmt.Printf("center_x:%f,center_y:%f\n", center_x, center_y)
+	// Reduce span
+	m.span = m.span * adj
+	m.span_one_dot = m.span / float64(m.size)
+	// Set upper left point
+	m.min_x = center_x - (m.span / 2.0)
+	m.min_y = center_y - (m.span / 2.0)
+}
+
 /*
 func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
 
@@ -1025,6 +1045,33 @@ func (bg *Background) GetColorChiocesStrings() []string {
 	return choices
 }
 
+func (bg *Background) AdjustPreview(m *Mandel, delta_x, delta_y, delta_span float64) {
+	m.AdjustPreview(delta_x, delta_y, delta_span)
+	// bg.cur_min_x += delta_x
+	// bg.cur_min_y += delta_y
+	// bg.cur_span *= delta_span
+}
+
+func (bg *Background) PanUp(m *Mandel) {
+	bg.AdjustPreview(m, 0.0, (m.span * bg.pan_speed), 1.0)
+}
+func (bg *Background) PanDown(m *Mandel) {
+	bg.AdjustPreview(m, 0.0, -(m.span * bg.pan_speed), 1.0)
+}
+func (bg *Background) PanLeft(m *Mandel) {
+	bg.AdjustPreview(m, -(m.span * bg.pan_speed), 0.0, 1.0)
+}
+func (bg *Background) PanRight(m *Mandel) {
+	bg.AdjustPreview(m, m.span*bg.pan_speed, 0.0, 1.0)
+}
+func (bg *Background) PanZoomIn(m *Mandel) {
+	bg.AdjustPreview(m, 0.0, 0.0, 1.0-0.5*(float64(bg.zoom_magnification)/float64(10.0)))
+}
+func (bg *Background) PanZoomOut(m *Mandel) {
+	bg.AdjustPreview(m, 0.0, 0.0, 1.0+(float64(bg.zoom_magnification)/float64(10.0)))
+
+}
+
 func NewBackground() Background {
 	bg := Background{
 		template_num:       0,
@@ -1033,9 +1080,10 @@ func NewBackground() Background {
 		zoom_magnification: 1,
 		zoom_in:            true,
 		image_defined:      0,
-		cur_min_x:          -1.0,
-		cur_min_y:          -1.5,
-		cur_span:           3.0,
+		//		cur_min_x:          -1.0,
+		//		cur_min_y:          -1.5,
+		//		cur_span:           3.0,
+		pan_speed: 0.1,
 	}
 	for i := 0; i < MAX_IMAGES; i++ {
 		bg.all_min_x = append(bg.all_min_x, float64(-1.0))
@@ -1108,6 +1156,8 @@ func main() {
 
 	zoomPathString := "Empty"
 	zoomPathLabel := widget.NewLabel(zoomPathString)
+	//zoomMagString := "Empty"
+	//zoomMagLabel := widget.NewLabel(zoomMagString)
 	colOneContent := container.New(layout.NewVBoxLayout())
 
 	myApp := app.New()
@@ -1118,7 +1168,7 @@ func main() {
 	// - Mobile platforms are always full screen
 	// - 27 is a hack determined by Ubuntu/Gnome
 	//myWindow.Resize(fyne.NewSize(256, (256 + 27)))
-	myWindow.Resize(fyne.NewSize(512, (256 + 27)))
+	myWindow.Resize(fyne.NewSize(1024, (1024 + 27)))
 
 	// Control Menu Set up
 	menuItemGenerate := fyne.NewMenuItem("Generate Background", func() {
@@ -1195,21 +1245,36 @@ func main() {
 	})
 	selectColorPreferenceChoices.SetSelectedIndex(0)
 
-	zoomMagnificationText := canvas.NewText("Zoom in Magnification (1x to 10x)", color.Black)
-
+	zoomMagnificationText := canvas.NewText("Zoom in Magnification (1x to 2x)", color.Black)
 	zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
+	zoomMagnificationSlider.SetValue(2.0)
 	zoomMagnificationSlider.OnChanged = func(f float64) {
 		fmt.Println("Zoom Magnification Callback:", f)
 		bg.zoom_magnification = int(f)
 	}
 	//zoomInText := canvas.NewText("Zoom in", color.Black)
-	zoomInCheckBox := widget.NewCheck("Zoom In", func(b bool) {
-		fmt.Println("Zoom In Callback:", b)
-		bg.zoom_in = b
-	})
-	zoomInCheckBox.SetChecked(true)
+	//zoomInCheckBox := widget.NewCheck("Zoom In", func(b bool) {
+	//	fmt.Println("Zoom In Callback:", b)
+	//	bg.zoom_in = b
+	//})
+	//zoomInCheckBox.SetChecked(true)
 	//zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomInText, zoomInCheckBox)
-	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomInCheckBox)
+
+	//zoomMagString = bg.PathImageString()
+	//zoomMagLabel.SetText(zoomPathString)
+
+	//zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomMagLabel)
+	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider)
+
+	panCheckBox := widget.NewCheck("Fine Grained Pan", func(b bool) {
+		fmt.Println("Zoom In Callback:", b)
+		if b {
+			bg.pan_speed = 0.01
+		} else {
+			bg.pan_speed = 0.1
+		}
+	})
+	panCheckBox.SetChecked(true)
 
 	addResetContent := container.New(layout.NewHBoxLayout())
 	addImageBtn := widget.NewButton("Add Image", func() {
@@ -1261,24 +1326,57 @@ func main() {
 	colOneContent.Add(selectColorPreferenceText)
 	colOneContent.Add(selectColorPreferenceChoices)
 	colOneContent.Add(zoomContent)
+	colOneContent.Add(panCheckBox)
 	colOneContent.Add(addResetContent)
 	colOneContent.Add(zoomPathLabel)
 
-	colTwoContent := container.New(layout.NewVBoxLayout())
 	previewText := canvas.NewText("Preview", color.Black)
 	myRaster.SetMinSize(fyne.NewSize(256, 256))
+
+	panControlContent := container.New(layout.NewHBoxLayout())
+	panUpBtn := widget.NewButton("Up", func() {
+		fmt.Println("Up")
+		bg.PanUp(&myMandel)
+	})
+	panDownBtn := widget.NewButton("Down", func() {
+		fmt.Println("Down")
+		bg.PanDown(&myMandel)
+	})
+	panLeftBtn := widget.NewButton("Left", func() {
+		fmt.Println("Left")
+		bg.PanLeft(&myMandel)
+	})
+	panRightBtn := widget.NewButton("Right", func() {
+		fmt.Println("Right")
+		bg.PanRight(&myMandel)
+	})
+	panZoomInBtn := widget.NewButton("Zoom In", func() {
+		fmt.Println("Zoom In")
+		bg.PanZoomIn(&myMandel)
+	})
+	panZoomOutBtn := widget.NewButton("Zoom Out", func() {
+		fmt.Println("Zoom In")
+		bg.PanZoomOut(&myMandel)
+	})
+	panControlContent.Add(panUpBtn)
+	panControlContent.Add(panDownBtn)
+	panControlContent.Add(panLeftBtn)
+	panControlContent.Add(panRightBtn)
+	panControlContent.Add(panZoomInBtn)
+	panControlContent.Add(panZoomOutBtn)
+
+	colTwoContent := container.New(layout.NewVBoxLayout())
+	colTwoContent.Add(layout.NewSpacer())
 	colTwoContent.Add(previewText)
 	colTwoContent.Add(myRaster)
-
-	topContent := container.New(layout.NewHBoxLayout())
-	topContent.Add(colOneContent)
-	topContent.Add(colTwoContent)
+	colTwoContent.Add(panControlContent)
+	colTwoContent.Add(layout.NewSpacer())
 
 	// Botton Content Creation
 	imageGenerationProgressBar := widget.NewProgressBar()
 	backgroundGenerationProgressBar := widget.NewProgressBar()
 
-	bottomContent := container.New(layout.NewVBoxLayout())
+	//bottomContent := container.New(layout.NewVBoxLayout())
 	generateBtn := widget.NewButton("Generate Background", func() {
 		// Check
 		if bg.image_defined != bg.TotalImages() {
@@ -1386,13 +1484,17 @@ func main() {
 	imageGenerationProgrogressContent.Add(imageGenerationProgressText)
 	imageGenerationProgrogressContent.Add(imageGenerationProgressBar)
 
-	bottomContent.Add(generateBtn)
-	bottomContent.Add(backgroundProgrogressContent)
-	bottomContent.Add(imageGenerationProgrogressContent)
+	colOneContent.Add(generateBtn)
+	colOneContent.Add(backgroundProgrogressContent)
+	colOneContent.Add(imageGenerationProgrogressContent)
+
+	topContent := container.New(layout.NewHBoxLayout())
+	topContent.Add(colOneContent)
+	topContent.Add(colTwoContent)
 
 	wholeContent := container.New(layout.NewVBoxLayout())
 	wholeContent.Add(topContent)
-	wholeContent.Add(bottomContent)
+	//wholeContent.Add(bottomContent)
 
 	myWindow.SetContent(wholeContent)
 

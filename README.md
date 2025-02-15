@@ -47,3 +47,31 @@ Drag Mandelbrot_Background.apk to emulator icon
 2) go mod tidy
 
 
+# Development To Do
+
+## Basic
+* Add Zoom Controls
+* Develop Icon
+* Write Fyne store toml
+
+## Bub Fixes
+* Fix Generate Background Menu Item 
+
+## Enhancements
+* Add more templates
+* Image Format Selection
+* Fix Generate Background Menu Item 
+* Add More Colors
+* Stretch Progress Bar
+* Bigger Window
+* Remove Debug Print 
+* Add Documentation
+* Image Growth with Window Resize
+* Show Intermediate images
+* Allow color changes between images
+
+## Go Code Enhacements
+* Multiple files 
+
+## Test Work
+* Test on Android 
