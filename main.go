@@ -21,6 +21,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+const DEBUG = false
+
 const (
 	MAX_DISPLAY_SIZE = 10000
 	MAX_IMAGES       = 256
@@ -122,6 +124,7 @@ const (
 	"default_color": [0,0,0]
 	  }
     ]`
+
 	all_color_names_str = `[
 	    "bold: blue,green,red",
 	    "bold: green,blue,red",
@@ -429,6 +432,13 @@ const (
 	]`
 )
 
+func DbgPrint(str ...interface{}) {
+	if DEBUG {
+		fmt.Println(str...)
+		return
+	}
+}
+
 type tappableRaster struct {
 	fyne.CanvasObject
 	OnTapped func()
@@ -438,15 +448,15 @@ func NewTappableRaster(raster fyne.CanvasObject, onTapped func()) *tappableRaste
 	return &tappableRaster{CanvasObject: raster, OnTapped: onTapped}
 }
 
-func (t *tappableRaster) Tapped(ev *fyne.PointEvent) {
-	fmt.Println("x,y:", ev.Position.X, ev.Position.Y)
-	t.OnTapped()
-}
+//func (t *tappableRaster) Tapped(ev *fyne.PointEvent) {
+//	fmt.Println("x,y:", ev.Position.X, ev.Position.Y)
+//	t.OnTapped()
+//}
 
 // func DoRasterTap(ev *fyne.PointEvent) {
-func DoRasterTap() {
-	fmt.Println("Tapped")
-}
+//func DoRasterTap() {
+//	fmt.Println("Tapped")
+//}
 
 //func (t *tappableRaster) pixelColor(x,y,w,h int) color.Color {
 //	fmt.Println( "x,y",x,y,w,h)
@@ -833,7 +843,7 @@ func (m *Mandel) AdjustPreview(delta_x, delta_y, delta_span float64) {
 func (m *Mandel) AdjustZoom(adj float64) {
 	center_x := m.min_x + (m.span / 2.0)
 	center_y := m.min_y + (m.span / 2.0)
-	fmt.Printf("center_x:%f,center_y:%f\n", center_x, center_y)
+	DbgPrint("center_x:%f,center_y:%f\n", center_x, center_y)
 	// Reduce span
 	m.span = m.span * adj
 	m.span_one_dot = m.span / float64(m.size)
@@ -1100,7 +1110,7 @@ func (bg *Background) TotalImages() int {
 
 func (bg *Background) PathImageString() string {
 	str := fmt.Sprintf("Zoom Path Points Defined: %d (out of %d)", bg.image_defined, bg.TotalImages())
-	fmt.Printf("template num %d", bg.template_num)
+	DbgPrint("template num %d", bg.template_num)
 	return str
 }
 
@@ -1185,20 +1195,19 @@ func NewBackground() Background {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
-	fmt.Printf("Templates: %+v", bg.templates)
+	DbgPrint("Templates: %+v", bg.templates)
 	// Read in Desktop size
 	err = json.Unmarshal([]byte(all_display_x_dots_str), &bg.desktop_x_dots)
 	if err != nil {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
-	fmt.Printf("Templates: %+v", bg.desktop_x_dots)
 	err = json.Unmarshal([]byte(all_display_y_dots_str), &bg.desktop_y_dots)
 	if err != nil {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
-	fmt.Printf("Templates: %+v", bg.desktop_y_dots)
+	DbgPrint("Templates: %+v", bg.desktop_y_dots)
 	return bg
 }
 
@@ -1293,7 +1302,9 @@ func main() {
 	selectBackgroundTemplateText := canvas.NewText("Select a background temple", color.Black)
 	selectBackgroundTemplateChoicesStrings := bg.GetTemplateChoicesStrings()
 	selectBackgroundTemplateChoices := widget.NewSelect(selectBackgroundTemplateChoicesStrings, func(s string) {
-		fmt.Println("Select Background Template Callback:", s)
+		if DEBUG {
+			fmt.Println("Select Background Template Callback:", s)
+		}
 		for i := 0; i < len(selectBackgroundTemplateChoicesStrings); i++ {
 			if selectBackgroundTemplateChoicesStrings[i] == s {
 				// New Template
@@ -1310,7 +1321,9 @@ func main() {
 	selectDesktopSizeText := canvas.NewText("Select your desktop size ", color.Black)
 	selectDesktopSizeChoicesStrings := bg.GetDesktopChiocesStrings()
 	selectDesktopSizeChoices := widget.NewSelect(selectDesktopSizeChoicesStrings, func(s string) {
-		fmt.Println("Select Desktop Size Callback:", s)
+		if DEBUG {
+			fmt.Println("Select Desktop Size Callback:", s)
+		}
 		for i := 0; i < len(selectDesktopSizeChoicesStrings); i++ {
 			if selectDesktopSizeChoicesStrings[i] == s {
 				bg.desktop_num = i
@@ -1323,7 +1336,9 @@ func main() {
 	selectColorPreferenceText := canvas.NewText("Select your color preference", color.Black)
 	selectColorPreferenceChoicesStrings := bg.GetColorChiocesStrings()
 	selectColorPreferenceChoices := widget.NewSelect(selectColorPreferenceChoicesStrings, func(s string) {
-		fmt.Println("Select Color Preference Callback:", s)
+		if DEBUG {
+			fmt.Println("Select Color Preference Callback:", s)
+		}
 		for i := 0; i < len(selectColorPreferenceChoicesStrings); i++ {
 			if selectColorPreferenceChoicesStrings[i] == s {
 				bg.color_theme_num = i
@@ -1339,7 +1354,9 @@ func main() {
 	zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
 	zoomMagnificationSlider.SetValue(2.0)
 	zoomMagnificationSlider.OnChanged = func(f float64) {
-		fmt.Println("Zoom Magnification Callback:", f)
+		if DEBUG {
+			fmt.Println("Zoom Magnification Callback:", f)
+		}
 		bg.zoom_magnification = int(f)
 	}
 	//zoomInText := canvas.NewText("Zoom in", color.Black)
@@ -1357,7 +1374,9 @@ func main() {
 	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider)
 
 	panCheckBox := widget.NewCheck("Fine Grained Pan", func(b bool) {
-		fmt.Println("Zoom In Callback:", b)
+		if DEBUG {
+			fmt.Println("Zoom In Callback:", b)
+		}
 		if b {
 			bg.pan_speed = 0.01
 		} else {
@@ -1370,7 +1389,9 @@ func main() {
 	addImageBtn := widget.NewButton("Add Image", func() {
 		// Check
 		if bg.image_defined >= bg.TotalImages() {
-			fmt.Println("Too many images defined")
+			if DEBUG {
+				fmt.Println("Too many images defined")
+			}
 			var popup *widget.PopUp
 			all_defined_label := widget.NewLabel("All Images Already Defined")
 			popUpContent := container.NewVBox(
@@ -1383,7 +1404,9 @@ func main() {
 			popup.Show()
 			return
 		}
-		fmt.Println("Add Image")
+		if DEBUG {
+			fmt.Println("Add Image")
+		}
 		bg.image_defined++
 		zoomPathString = bg.PathImageString()
 		zoomPathLabel.SetText(zoomPathString)
@@ -1391,11 +1414,15 @@ func main() {
 		bg.all_min_x[bg.image_defined] = myMandel.min_x
 		bg.all_min_y[bg.image_defined] = myMandel.min_y
 		bg.all_span[bg.image_defined] = myMandel.span
-		fmt.Printf("zoomPathString: %d", bg.image_defined)
+		if DEBUG {
+			fmt.Printf("zoomPathString: %d", bg.image_defined)
+		}
 		// FIXME: Add Image
 	})
 	resetPathBtn := widget.NewButton("Reset", func() {
-		fmt.Println("Reset")
+		if DEBUG {
+			fmt.Println("Reset")
+		}
 		bg.image_defined = 0
 		myMandel.ResetSpan()
 		myMandel.up_to_date = false
@@ -1431,27 +1458,39 @@ func main() {
 
 	panControlContent := container.New(layout.NewHBoxLayout())
 	panUpBtn := widget.NewButton("Up", func() {
-		fmt.Println("Up")
+		if DEBUG {
+			fmt.Println("Up")
+		}
 		bg.PanUp(&myMandel)
 	})
 	panDownBtn := widget.NewButton("Down", func() {
-		fmt.Println("Down")
+		if DEBUG {
+			fmt.Println("Down")
+		}
 		bg.PanDown(&myMandel)
 	})
 	panLeftBtn := widget.NewButton("Left", func() {
-		fmt.Println("Left")
+		if DEBUG {
+			fmt.Println("Left")
+		}
 		bg.PanLeft(&myMandel)
 	})
 	panRightBtn := widget.NewButton("Right", func() {
-		fmt.Println("Right")
+		if DEBUG {
+			fmt.Println("Right")
+		}
 		bg.PanRight(&myMandel)
 	})
 	panZoomInBtn := widget.NewButton("Zoom In", func() {
-		fmt.Println("Zoom In")
+		if DEBUG {
+			fmt.Println("Zoom In")
+		}
 		bg.PanZoomIn(&myMandel)
 	})
 	panZoomOutBtn := widget.NewButton("Zoom Out", func() {
-		fmt.Println("Zoom In")
+		if DEBUG {
+			fmt.Println("Zoom In")
+		}
 		bg.PanZoomOut(&myMandel)
 	})
 	panControlContent.Add(panUpBtn)
@@ -1476,7 +1515,9 @@ func main() {
 	generateBtn := widget.NewButton("Generate Background", func() {
 		// Check
 		if bg.image_defined != bg.TotalImages() {
-			fmt.Println("Location for all images is not defined")
+			if DEBUG {
+				fmt.Println("Location for all images is not defined")
+			}
 			var popup *widget.PopUp
 			all_defined_label := widget.NewLabel("Location for all images is not defined")
 			popUpContent := container.NewVBox(
@@ -1489,9 +1530,13 @@ func main() {
 			popup.Show()
 			return
 		}
-		fmt.Println("Generate Background")
+		if DEBUG {
+			fmt.Println("Generate Background")
+		}
 		mbg_image := image.NewRGBA(image.Rect(0, 0, bg.desktop_x_dots[bg.desktop_num], bg.desktop_y_dots[bg.desktop_num]))
-		fmt.Println("Making Black")
+		if DEBUG {
+			fmt.Println("Making Black")
+		}
 		for px := 0; px < bg.desktop_x_dots[bg.desktop_num]; px++ {
 			for py := 0; py < bg.desktop_y_dots[bg.desktop_num]; py++ {
 				mbg_image.Set(px, py, color.RGBA{0x0, 0x0, 0x0, 0xff})

@@ -50,8 +50,6 @@ Drag Mandelbrot_Background.apk to emulator icon
 # Development To Do
 
 ## Basic
-* Develop Icon
-* Write Fyne store toml
 
 ## Bub Fixes
 
