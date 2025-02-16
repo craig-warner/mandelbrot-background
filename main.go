@@ -23,7 +23,7 @@ import (
 
 const DEBUG = false
 
-const WINDOW_SIZE = 800
+const WINDOW_SIZE = 512
 
 const (
 	MAX_DISPLAY_SIZE = 10000

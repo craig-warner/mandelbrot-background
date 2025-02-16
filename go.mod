@@ -1,4 +1,4 @@
-module main.go
+module mandelbrot-background 
 
 go 1.22.2
 
