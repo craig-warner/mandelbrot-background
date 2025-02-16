@@ -54,9 +54,7 @@ Drag Mandelbrot_Background.apk to emulator icon
 ## Bub Fixes
 
 ## Enhancements
-* Add more templates
 * Image Format Selection
-* Fix Generate Background Menu Item 
 * Add More Colors
 * Stretch Progress Bar
 * Bigger Window

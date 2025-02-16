@@ -23,6 +23,8 @@ import (
 
 const DEBUG = false
 
+const WINDOW_SIZE = 800
+
 const (
 	MAX_DISPLAY_SIZE = 10000
 	MAX_IMAGES       = 256
@@ -1257,6 +1259,7 @@ func main() {
 	//zoomMagString := "Empty"
 	//zoomMagLabel := widget.NewLabel(zoomMagString)
 	colOneContent := container.New(layout.NewVBoxLayout())
+	//widthCtlText := canvas.NewText("===========================================", color.Black)
 
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Mandelbrot Background")
@@ -1266,7 +1269,7 @@ func main() {
 	// - Mobile platforms are always full screen
 	// - 27 is a hack determined by Ubuntu/Gnome
 	//myWindow.Resize(fyne.NewSize(256, (256 + 27)))
-	myWindow.Resize(fyne.NewSize(256, (256 + 27)))
+	myWindow.Resize(fyne.NewSize(WINDOW_SIZE, (WINDOW_SIZE + 27)))
 
 	// Control Menu Set up
 	//	menuItemGenerate := fyne.NewMenuItem("Generate Background", func() {
@@ -1438,6 +1441,7 @@ func main() {
 
 	// Column One
 	//colOneContent := container.New(layout.NewVBoxLayout())
+	//colOneContent.Add(widthCtlText)
 	colOneContent.Add(selectBackgroundTemplateText)
 	colOneContent.Add(selectBackgroundTemplateChoices)
 	colOneContent.Add(selectDesktopSizeText)
