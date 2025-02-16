@@ -252,14 +252,122 @@ JSON Structure
 */
 const (
 	all_template_str = `[
-		{ 	"version":"1.0",
+		{
+    		"version": "2.0",
+    		"num_images": 1,
+    		"x_units": 4,
+    		"y_units": 2,
+    		"high_precision": false,
+    		"save_filename": "mbg_one",
+    		"images": [
+     		 { "side_size": 2, "bg_x": 1, "bg_y": 0 }
+    		]
+		},
+		{ 	"version": "2.0",
+    		"num_images": 2,
+    		"x_units": 2,
+    		"y_units": 1,
+    		"high_precision": false,
+    		"save_filename": "mbg_two",
+    		"images": [
+      			{ "side_size": 1, "bg_x": 0, "bg_y": 0 },
+      			{ "side_size": 1, "bg_x": 1, "bg_y": 0 }
+    		]
+		},
+		{
+    		"version": "2.0",
+    		"num_images": 3,
+    		"x_units": 3,
+    		"y_units": 2,
+    		"high_precision": false,
+    		"save_filename": "mbg_three",
+    		"images": [ 
+				{ "side_size": 1, "bg_x": 0,     "bg_y": 1      },
+      			{ "side_size": 1, "bg_x": 0, "bg_y": 0 }, 
+				 { "side_size": 2, "bg_x": 1, "bg_y": 0 }
+    		]
+  		},
+		{ 
+		"version":"2.0",
+		"x_units": 16,
+  		"y_units": 8,
+  		"high_precision": false,
+  		"save_filename": "mbg_8",
+  		"images": [
+    		{ "side_size": 2, "bg_x": 0, "bg_y": 6 },
+    		{ "side_size": 2, "bg_x": 2, "bg_y": 6 },
+    		{ "side_size": 2, "bg_x": 0, "bg_y": 4 },
+    		{ "side_size": 2, "bg_x": 2, "bg_y": 4 },
+    		{ "side_size": 4, "bg_x": 4, "bg_y": 4 },
+    		{ "side_size": 4, "bg_x": 0, "bg_y": 0 },
+    		{ "side_size": 4, "bg_x": 4, "bg_y": 0 },
+    		{ "side_size": 8, "bg_x": 8, "bg_y": 0 }
+  		]
+		},
+		{
+		"version":"2.0",
+		"x_units": 16,
+  		"y_units": 8,
+  		"high_precision": false,
+  		"save_filename": "mbg_11",
+  		"images": [ 
+			{ "side_size": 1, "bg_x": 15, "bg_y": 7 },
+    		{ "side_size": 1, "bg_x": 14, "bg_y": 7 },
+    		{ "side_size": 1, "bg_x": 14, "bg_y": 6 },
+    		{ "side_size": 1, "bg_x": 15, "bg_y": 6 },
+    		{ "side_size": 2, "bg_x": 12, "bg_y": 6 },
+    		{ "side_size": 2, "bg_x": 12, "bg_y": 4 },
+    		{ "side_size": 2, "bg_x": 14, "bg_y": 4 },
+    		{ "side_size": 4, "bg_x": 8, "bg_y": 4 },
+    		{ "side_size": 4, "bg_x": 8, "bg_y": 0 },
+    		{ "side_size": 4, "bg_x": 12, "bg_y": 0 },
+    		{ "side_size": 8, "bg_x": 0, "bg_y": 0 }
+  		]
+		},
+		{
+    		"version": "2.0",
+    		"num_images": 5,
+    		"x_units": 4,
+    		"y_units": 2,
+    		"high_precision": false,
+    		"save_filename": "mbg_5",
+    		"images": [
+      			{ "side_size": 2, "bg_x": 1, "bg_y": 0 },
+      			{ "side_size": 1, "bg_x": 0, "bg_y": 1 },
+      			{ "side_size": 1, "bg_x": 3, "bg_y": 1 },
+      			{ "side_size": 1, "bg_x": 0, "bg_y": 0 },
+      			{ "side_size": 1, "bg_x": 3, "bg_y": 0 }
+    		]
+		},
+		{
+			"num_images": 14,
+  			"x_units": 32,
+  			"y_units": 16,
+  			"high_precision": false,
+  			"save_filename": "mbg_14",
+  			"images": [ 
+				{ "side_size": 1, "bg_x": 31, "bg_y": 15 },
+      			{ "side_size": 1, "bg_x": 30, "bg_y": 15 },
+      			{ "side_size": 1, "bg_x": 30, "bg_y": 14 },
+      			{ "side_size": 1, "bg_x": 31, "bg_y": 14 },
+      			{ "side_size": 2, "bg_x": 28, "bg_y": 14 },
+      			{ "side_size": 2, "bg_x": 28, "bg_y": 12 },
+      			{ "side_size": 2, "bg_x": 30, "bg_y": 12 },
+      			{ "side_size": 4, "bg_x": 24, "bg_y": 12 },
+      			{ "side_size": 4, "bg_x": 24, "bg_y": 8 },
+      			{ "side_size": 4, "bg_x": 28, "bg_y": 8 },
+      			{ "side_size": 8, "bg_x": 16, "bg_y": 8 },
+      			{ "side_size": 8, "bg_x": 16, "bg_y": 0 },
+      			{ "side_size": 8, "bg_x": 24, "bg_y": 0 },
+      			{ "side_size": 16, "bg_x": 0, "bg_y": 0 }
+  			]
+		},
+		{ 	"version":"2.0",
 			"num_images":17,
-			"rgb":"bgr",
-			"bits_per_color":4,
-			"brightness_shift":4,
 			"x_units":8,
 			"y_units":4,
 			"high_precision":false,
+  			"save_filename": "mbg_17",
 			"images": [ { "side_size": 1, "bg_x": 0, "bg_y": 3 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 2 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 1 },
@@ -281,12 +389,10 @@ const (
 		},
 		{ 	"version": "1.0",
     		"num_images": 17,
-    		"rgb": "bgr",
-    		"bits_per_color": 4,
-    		"brightness_shift": 3,
     		"x_units": 8,
     		"y_units": 4,
     		"high_precision": false,
+  			"save_filename": "mbg_diag17",
     		"images": [
 				{ "side_size": 1, "bg_x": 0, "bg_y": 0 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 1 },
@@ -306,35 +412,20 @@ const (
 				{ "side_size": 1, "bg_x": 3, "bg_y": 3 },
 				{ "side_size": 4, "bg_x": 4, "bg_y": 0 }
     		]
-		},
-		{ 	"version": "1.0",
-			"num_images": 2,
-			"rgb": "bgr",
-			"bits_per_color": 4,
-			"brightness_shift": 3,
-			"x_units": 2,
-			"y_units": 1,
-			"high_precision": false,
-    		"images": [
-				{
-					"side_size": 1,
-					"bg_x": 0,
-					"bg_y": 0 
-				},
-				{
-					"side_size": 1,
-					"bg_x": 1,
-					"bg_y": 0 
-				}
-			]
-		} 
+		}
 	]`
 )
 const (
 	all_template_names_str = `[
+		"One (1 Images)",
+		"Two (2 Images)",
+		"Three (3 Images)",
+		"Big Right (8 Images)",
+		"Big Right (11 Images)",
+		"First Center (5 Images)",
+		"Big Right (14 Images)",
 		"Big Center (17 Images)",
-		"Diagonal (17 Images)",
-		"Two (2 Images)"
+		"Diagonal (17 Images)"
 	]`
 )
 
@@ -405,15 +496,12 @@ type ImageTemplate struct {
 }
 
 type Template struct {
-	Version          string          `json:"version"`
-	Num_images       int             `json:"num_images"`
-	Rgb              string          `json:"rgb"`
-	Bits_per_color   int             `json:"bits_per_color"`
-	Brightness_shift int             `json:"brightness_shift"`
-	X_units          int             `json:"x_units"`
-	Y_units          int             `json:"y_units"`
-	High_precision   bool            `json:"high_precision"`
-	Images           []ImageTemplate `json:"images"`
+	Version       string          `json:"version"`
+	Num_images    int             `json:"num_images"`
+	X_units       int             `json:"x_units"`
+	Y_units       int             `json:"y_units"`
+	Save_filename string          `json:"save_filename"`
+	Images        []ImageTemplate `json:"images"`
 }
 
 type Background struct {
@@ -932,7 +1020,8 @@ func NewMandel(min_x, min_y, span float64, size, color_theme_num int) Mandel {
 		// Math
 		//span:      3.0,
 		span:      span,
-		threshold: 1000.0,
+		threshold: 10000000.0,
+		//threshold: 10.0,
 		//		min_x:     -1.0,
 		min_x: min_x,
 		//		max_x: 2.0,
@@ -1168,18 +1257,19 @@ func main() {
 	// - Mobile platforms are always full screen
 	// - 27 is a hack determined by Ubuntu/Gnome
 	//myWindow.Resize(fyne.NewSize(256, (256 + 27)))
-	myWindow.Resize(fyne.NewSize(1024, (1024 + 27)))
+	myWindow.Resize(fyne.NewSize(256, (256 + 27)))
 
 	// Control Menu Set up
-	menuItemGenerate := fyne.NewMenuItem("Generate Background", func() {
-		fmt.Println("In Generate Background")
-	})
+	//	menuItemGenerate := fyne.NewMenuItem("Generate Background", func() {
+	//		fmt.Println("In Generate Background")
+	//	})
 	menuItemQuit := fyne.NewMenuItem("Quit", func() {
 		//fmt.Println("In DoQuit:")
 		os.Exit(0)
 	})
 	//	menuControl:= fyne.NewMenu("Control", menuItemColor, menuItemZoom, menuItemQuit);
-	menuControl := fyne.NewMenu("Control", menuItemGenerate, menuItemQuit)
+	//menuControl := fyne.NewMenu("Control", menuItemGenerate, menuItemQuit)
+	menuControl := fyne.NewMenu("Control", menuItemQuit)
 	// About Menu Set up
 	menuItemAbout := fyne.NewMenuItem("About...", func() {
 		dialog.ShowInformation("About Mandelbrot Background v1.0.0", "Author: Craig Warner \n\ngithub.com/craig-warner/mandelbrot-background", myWindow)
@@ -1307,6 +1397,8 @@ func main() {
 	resetPathBtn := widget.NewButton("Reset", func() {
 		fmt.Println("Reset")
 		bg.image_defined = 0
+		myMandel.ResetSpan()
+		myMandel.up_to_date = false
 		zoomPathString = bg.PathImageString()
 		zoomPathLabel.SetText(zoomPathString)
 		zoomPathLabel.Refresh()
@@ -1332,6 +1424,10 @@ func main() {
 
 	previewText := canvas.NewText("Preview", color.Black)
 	myRaster.SetMinSize(fyne.NewSize(256, 256))
+	previewContent := container.New(layout.NewHBoxLayout())
+	previewContent.Add(layout.NewSpacer())
+	previewContent.Add(myRaster)
+	previewContent.Add(layout.NewSpacer())
 
 	panControlContent := container.New(layout.NewHBoxLayout())
 	panUpBtn := widget.NewButton("Up", func() {
@@ -1368,7 +1464,7 @@ func main() {
 	colTwoContent := container.New(layout.NewVBoxLayout())
 	colTwoContent.Add(layout.NewSpacer())
 	colTwoContent.Add(previewText)
-	colTwoContent.Add(myRaster)
+	colTwoContent.Add(previewContent)
 	colTwoContent.Add(panControlContent)
 	colTwoContent.Add(layout.NewSpacer())
 
@@ -1471,7 +1567,8 @@ func main() {
 			//	return
 			//}
 		}, myWindow)
-		file_name_save.SetFileName("mbg.png")
+		save_filename := bg.templates[bg.template_num].Save_filename + ".png"
+		file_name_save.SetFileName(save_filename)
 		file_name_save.SetOnClosed(func() { fmt.Println("Save Closed") })
 		file_name_save.Show()
 	})
@@ -1489,11 +1586,15 @@ func main() {
 	colOneContent.Add(imageGenerationProgrogressContent)
 
 	topContent := container.New(layout.NewHBoxLayout())
+	topContent.Add(layout.NewSpacer())
 	topContent.Add(colOneContent)
 	topContent.Add(colTwoContent)
+	topContent.Add(layout.NewSpacer())
 
 	wholeContent := container.New(layout.NewVBoxLayout())
+	wholeContent.Add(layout.NewSpacer())
 	wholeContent.Add(topContent)
+	wholeContent.Add(layout.NewSpacer())
 	//wholeContent.Add(bottomContent)
 
 	myWindow.SetContent(wholeContent)

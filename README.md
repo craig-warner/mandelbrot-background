@@ -50,12 +50,10 @@ Drag Mandelbrot_Background.apk to emulator icon
 # Development To Do
 
 ## Basic
-* Add Zoom Controls
 * Develop Icon
 * Write Fyne store toml
 
 ## Bub Fixes
-* Fix Generate Background Menu Item 
 
 ## Enhancements
 * Add more templates
