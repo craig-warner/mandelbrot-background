@@ -10,7 +10,6 @@ import (
 	"time"
 
 	//	"github.com/hjson/hjson-go/v4"
-	"encoding/json"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -28,203 +27,6 @@ const WINDOW_SIZE = 512
 const (
 	MAX_DISPLAY_SIZE = 10000
 	MAX_IMAGES       = 256
-)
-
-/*
-JSON Structure Defining Color Settings
-*/
-const (
-	all_colors_str = `[
-      { "Ibits": 12,
-	"blue_pos":    [  4,   5,   6,  7,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1],
-	"green_pos":   [ -1,  -1,  -1,   4,  5,   6,   7,  -1,  -1,  -1,  -1,  -1],
-	"red_pos":     [ -1,  -1,  -1,  -1,  -1,  -1, -1,  -1,   4,   5,   6,   7],
-	"default_color": [0,0,0] 
-      },
-      { "ibits": 9,
-	"green_pos":    [  5,   6,   7,  -1,  -1,  -1,  -1,  -1,  -1],
-	"blue_pos":   [ -1,  -1,  -1,   5,   6,   7,  -1,  -1,  -1],
-	"red_pos":     [ -1,  -1,  -1,  -1,  -1,  -1,   5,   6,   7],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 9,
-	"red_pos":    [  5,   6,   7,  -1,  -1,  -1,  -1,  -1,  -1],
-	"blue_pos":   [ -1,  -1,  -1,   5,   6,   7,  -1,  -1,  -1],
-	"green_pos":     [ -1,  -1,  -1,  -1,  -1,  -1,   5,   6,   7],
-	"default_color":[0,0,0]
-      },
-      { "ibits": 9,
-	"blue_pos":    [  3,   4,   5,  -1,  -1,  -1,  -1,  -1,  -1],
-	"green_pos":   [ -1,  -1,  -1,   3,   4,   5,  -1,  -1,  -1],
-	"red_pos":     [ -1,  -1,  -1,  -1,  -1,  -1,   3,   4,   5],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 9,
-	"green_pos":    [  3,   4,   5,  -1,  -1,  -1,  -1,  -1,  -1],
-	"blue_pos":   [ -1,  -1,  -1,   3,   4,   5,  -1,  -1,  -1],
-	"red_pos":     [ -1,  -1,  -1,  -1,  -1,  -1,   3,   4,   5],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 9,
-	"red_pos":    [  3,   4,   5,  -1,  -1,  -1,  -1,  -1,  -1],
-	"blue_pos":   [ -1,  -1,  -1,   3,   4,   5,  -1,  -1,  -1],
-	"green_pos":     [ -1,  -1,  -1,  -1,  -1,  -1,   3,   4,   5],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 6,
-	"blue_pos":    [  2, 3,  4,   5,   6,   7],
-	"green_pos":   [ 1,-1,-1, -1,-1,-1,-1],
-	"red_pos":     [ -1,-1, -1,-1,-1,-1],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 6,
-	"blue_pos":    [   2,   3,   4,  5,  6,  7],
-	"red_pos":     [   2,   3,   4,  5,  6,  7],
-	"green_pos":    [ -1,  -1,  -1, -1, -1, -1],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 6,
-	"blue_pos":    [   2,   3,   4,  5,  6,  7],
-	"red_pos":     [   2,   3,   4,  5,  6,  7],
-	"green_pos":    [ -1,  -1,  -1, -1, -1, -1],
-	"default_color": [113,1,147]
-      },
-      { "ibits": 6,
-	"blue_pos":    [  0,  1,  2, 3, 4, 5],
-	"red_pos":     [   2,   3,   4,  5,  6,  7],
-	"green_pos":    [  0,  1,  2, 3, 4, 5],
-	"default_color": [0,0,0]
-	  },
-      { "ibits": 6,
-	"blue_pos":    [   -1,   -1,  -1,  -1,  -1, -1],
-	"red_pos":     [   2,   3,   4,  5,  6,  7],
-	"green_pos":    [  0,  1,  2, 3, 4, 5],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 6,
-	"red_pos":    [  0,  1,  2, 3, 4, 5],
-	"blue_pos":    [  0,  1,  2, 3, 4, 5],
-	"green_pos":    [   2,   3,   4,  5,  6,  7],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 6,
-	"blue_pos":     [   0,   1,   2,  3,  4,  5],
-	"red_pos":     [   2,   3,   4,  5,  6,  7],
-	"green_pos":     [   1,   2,   3,  4,  5,  6],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 6,
-	"blue_pos":     [   2,   3,   4,  5,  6,  7],
-	"red_pos":     [   2,   3,   4,  5,  6,  7],
-	"green_pos":     [   2,   3,   4,  5,  6,  7],
-	"default_color": [0,0,0]
-      },
-      { "ibits": 12,
-	"blue_pos":     [   2,   3,   4,  5,  6,  7, -1 ,-1 ,-1,-1, -1, -1 ],
-	"green_pos":     [  -1 ,-1 ,-1,-1, -1, -1,  2,   3,   4,  5,  6,  7],
-	"red_pos":     [  -1,-1, -1, -1, -1, -1, -1 ,-1 ,-1,-1, -1, -1 ],
-	"default_color": [0,0,0]
-	  }
-    ]`
-
-	all_color_names_str = `[
-	    "bold: blue,green,red",
-	    "bold: green,blue,red",
-	    "bold: red,blue,green",
-	    "dim: blue,green,red",
-	    "dim: green,blue,red",
-	    "dim: red,blue,green",
-	    "all blue",
-	    "all purple",
-	    "all purple - purple center",
-	    "all maroon",
-	    "all orange",
-	    "all lime green",
-	    "all gold",
-	    "all Black",
-	    "high resolution: blue, green"
-	]`
-)
-
-/*
-JSON Structure Defining Display Sizes
-*/
-const (
-	all_display_description_str = `[
-            "128 x 108 (Test Size)",
-            "640 x 360 (nHD)",
-            "800 x 600 (SVGA)",
-            "1024 x 768 (XGA)",
-            "1280 x 720 (WXGA - 16:9)",
-            "1280 x 800 (WXGA - 16:10)",
-            "1280 x 1024 Super-eXtended Graphics Array (SXGA)",
-            "1360 x 768 High Definition (HD - 1360 width)",
-            "1366 x 768 High Definition (HD - 1366 width)",
-            "1440 x 900 (WXGA+)",
-            "1536 x 864 No Name",
-            "1600 x 900 High Definition Plus (HD+)",
-            "1600 x 1200 (UXGA)",
-            "1680 x 1050 (WSXGA+)",
-            "1920 x 1080 Full High Definition (FHD)",
-            "1920 x 1200 Wide Ultra Extended Graphics Array (WUXGA)",
-            "2048 x 1152 (QWXGA)",
-            "2048 x 1536 (QXGA)",
-            "2560 x 1080 (UWFHD)",
-            "2560 x 1440 Quad High Definition (QHD)",
-            "2560 x 1600 (WQXGA)",
-            "3440 x 1440 Wide Quad High Definition (UWQHD)",
-            "3840 x 2160 4K or Ultra High Definition (UHD)"
-	]`
-	all_display_x_dots_str = `[
-            128,
-            640,
-            800,
-            1024,
-            1280,
-            1280,
-            1280,
-            1360,
-            1366,
-            1440,
-            1536,
-            1600,
-            1600,
-            1680,
-            1920,
-            1920,
-            2048,
-            2048,
-            2560,
-            2560,
-            2560,
-            3440,
-            3840
-	]`
-	all_display_y_dots_str = `[
-            108,
-            360,
-            600,
-            768,
-            720,
-            800,
-            1024,
-            768,
-            768,
-            900,
-            864,
-            900,
-            1200,
-            1050,
-            1080,
-            1200,
-            1152,
-            1536,
-            1080,
-            1440,
-            1600,
-            1440,
-            2160
-	]`
 )
 
 /*
@@ -255,6 +57,7 @@ JSON Structure
 		]
 	}
 */
+/*
 const (
 	all_template_str = `[
 		{
@@ -286,13 +89,13 @@ const (
     		"y_units": 2,
     		"high_precision": false,
     		"save_filename": "mbg_three",
-    		"images": [ 
+    		"images": [
 				{ "side_size": 1, "bg_x": 0,     "bg_y": 1      },
-      			{ "side_size": 1, "bg_x": 0, "bg_y": 0 }, 
+      			{ "side_size": 1, "bg_x": 0, "bg_y": 0 },
 				 { "side_size": 2, "bg_x": 1, "bg_y": 0 }
     		]
   		},
-		{ 
+		{
 		"version":"2.0",
 		"x_units": 16,
   		"y_units": 8,
@@ -315,7 +118,7 @@ const (
   		"y_units": 8,
   		"high_precision": false,
   		"save_filename": "mbg_11",
-  		"images": [ 
+  		"images": [
 			{ "side_size": 1, "bg_x": 15, "bg_y": 7 },
     		{ "side_size": 1, "bg_x": 14, "bg_y": 7 },
     		{ "side_size": 1, "bg_x": 14, "bg_y": 6 },
@@ -350,7 +153,7 @@ const (
   			"y_units": 16,
   			"high_precision": false,
   			"save_filename": "mbg_14",
-  			"images": [ 
+  			"images": [
 				{ "side_size": 1, "bg_x": 31, "bg_y": 15 },
       			{ "side_size": 1, "bg_x": 30, "bg_y": 15 },
       			{ "side_size": 1, "bg_x": 30, "bg_y": 14 },
@@ -433,6 +236,7 @@ const (
 		"Diagonal (17 Images)"
 	]`
 )
+*/
 
 func DbgPrint(str ...interface{}) {
 	if DEBUG {
@@ -466,6 +270,7 @@ func NewTappableRaster(raster fyne.CanvasObject, onTapped func()) *tappableRaste
 //}
 
 // Field Names MUST start with a capital letter
+/*
 type MandelColor struct {
 	Ibits         int
 	Blue_pos      []int
@@ -500,7 +305,9 @@ type Color struct {
 	green uint8
 	blue  uint8
 }
+*/
 
+/*
 type ImageTemplate struct {
 	Side_size int `json:"side_size"`
 	Bg_x      int `json:"bg_x"`
@@ -541,10 +348,12 @@ type Point struct {
 	y float64
 }
 
+*/
 /*
  * General Functions
  */
 
+/*
 func NewColor(r, g, b uint8) Color {
 	c := Color{
 		red:   r,
@@ -553,6 +362,7 @@ func NewColor(r, g, b uint8) Color {
 	}
 	return c
 }
+*/
 
 func NewPoint(set_x, set_y float64) Point {
 	p := Point{
@@ -566,6 +376,7 @@ func NewPoint(set_x, set_y float64) Point {
  * Mandel functions
  */
 
+/*
 func (m *Mandel) CalcIterationsOneXY(c, di float64) int {
 	newA := 0.0
 	newBi := 0.0
@@ -785,6 +596,7 @@ func (m *Mandel) CalcBundleSize() int {
 	bsize := 16
 	return bsize
 }
+*/
 
 /*
 func (m *Mandel) CalcBundleSize() int {
@@ -808,6 +620,7 @@ func (m *Mandel) CalcBundleSize() int {
 }
 */
 
+/*
 func (m *Mandel) PercentCalced() float64 {
 	return (float64(m.cur_y) / float64(m.size))
 }
@@ -927,6 +740,7 @@ func (m *Mandel) RoamTgtScreenTwo(x, y float64) bool {
 	}
 }
 */
+
 /*
 func RoamCalcDistance(x, y float64) float64 {
 	distance := math.Sqrt(x*x + y*y)
@@ -1021,6 +835,7 @@ func (m *Mandel) FrcRedraw() {
 }
 */
 
+/*
 func NewMandel(min_x, min_y, span float64, size, color_theme_num int) Mandel {
 	//	var lcl_all_colors []MandelColor
 	m := Mandel{
@@ -1068,11 +883,13 @@ func NewMandel(min_x, min_y, span float64, size, color_theme_num int) Mandel {
 	//fmt.Println(m.all_color_names)
 	return m
 }
+*/
 
 /*
  * Background functions
  */
 
+/*
 func (bg *Background) PixelsPerUnit() int {
 	pixels_per_unit := 1
 	width := bg.desktop_x_dots[bg.desktop_num]
@@ -1212,7 +1029,7 @@ func NewBackground() Background {
 	DbgPrint("Templates: %+v", bg.desktop_y_dots)
 	return bg
 }
-
+*/
 /*
  * Basic Image Functions
  */

@@ -3,8 +3,8 @@ Mandelbrot background drawing program written in go using fyne.io
 
 # Running on Windows
 ## msys-x64
-% go build -v main.go
-% go run -v main.go
+% go build -v *.go
+% go run -v *.go
 
 # Building .apk for Android Studio
 ## msys-x64 
