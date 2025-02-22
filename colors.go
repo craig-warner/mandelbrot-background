@@ -125,29 +125,6 @@ type MandelColor struct {
 	Default_color []uint8
 }
 
-/*
-type Mandel struct {
-	up_to_date      bool
-	size            int
-	cur_x           int
-	cur_y           int
-	cur_granularity int
-	tiles           [][]Color
-	// Math
-	threshold    float64
-	span         float64
-	span_one_dot float64
-	min_x, min_y float64
-	// Window
-	cur_w, cur_h                          int
-	black_out_top, black_out_left         int
-	centering_top_adj, centering_left_adj int
-	// Colors
-	cur_color_num int
-	all_colors    []MandelColor
-}
-*/
-
 type Color struct {
 	red   uint8
 	green uint8

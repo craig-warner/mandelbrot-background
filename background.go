@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/craig-warner/mandelbrot-background/pkg/ctlprint"
 )
 
 const (
@@ -157,8 +159,6 @@ const (
 				{ "side_size": 1, "bg_x": 2, "bg_y": 0 },
 				{ "side_size": 1, "bg_x": 0, "bg_y": 3 },
 				{ "side_size": 1, "bg_x": 1, "bg_y": 2 },
-				{ "side_size": 1, "bg_x": 2, "bg_y": 1 },
-				{ "side_size": 1, "bg_x": 3, "bg_y": 0 },
 				{ "side_size": 1, "bg_x": 1, "bg_y": 3 },
 				{ "side_size": 1, "bg_x": 2, "bg_y": 2 },
 				{ "side_size": 1, "bg_x": 3, "bg_y": 1 },
@@ -217,6 +217,7 @@ type Background struct {
 	images         []Mandel
 	desktop_x_dots []int
 	desktop_y_dots []int
+	cp             ctlprint.CtlPrint
 }
 
 type Point struct {
@@ -267,7 +268,7 @@ func (bg *Background) TotalImages() int {
 
 func (bg *Background) PathImageString() string {
 	str := fmt.Sprintf("Zoom Path Points Defined: %d (out of %d)", bg.image_defined, bg.TotalImages())
-	DbgPrint("template num %d", bg.template_num)
+	bg.cp.DbgPrint("template num %d", bg.template_num)
 	return str
 }
 
@@ -328,7 +329,7 @@ func (bg *Background) PanZoomOut(m *Mandel) {
 
 }
 
-func NewBackground() Background {
+func NewBackground(cp ctlprint.CtlPrint) Background {
 	bg := Background{
 		template_num:       0,
 		desktop_num:        0,
@@ -340,6 +341,7 @@ func NewBackground() Background {
 		//		cur_min_y:          -1.5,
 		//		cur_span:           3.0,
 		pan_speed: 0.1,
+		cp:        cp,
 	}
 	for i := 0; i < MAX_IMAGES; i++ {
 		bg.all_min_x = append(bg.all_min_x, float64(-1.0))
@@ -352,7 +354,7 @@ func NewBackground() Background {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
-	DbgPrint("Templates: %+v", bg.templates)
+	cp.DbgPrint("Templates: %+v", bg.templates)
 	// Read in Desktop size
 	err = json.Unmarshal([]byte(all_display_x_dots_str), &bg.desktop_x_dots)
 	if err != nil {
@@ -364,6 +366,6 @@ func NewBackground() Background {
 		fmt.Printf("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
-	DbgPrint("Templates: %+v", bg.desktop_y_dots)
+	cp.DbgPrint("Templates: %+v", bg.desktop_y_dots)
 	return bg
 }

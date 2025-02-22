@@ -1,6 +1,8 @@
-module mandelbrot-background 
+module github.com/craig-warner/mandelbrot-background 
 
 go 1.22.2
+
+require pkg/ctlprint v1.0.0
 
 require fyne.io/fyne/v2 v2.5.4
 

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/craig-warner/mandelbrot-background/pkg/ctlprint"
+
 	"encoding/json"
 	"fmt"
 	"image/color"
@@ -25,6 +27,7 @@ type Mandel struct {
 	// Colors
 	cur_color_num int
 	all_colors    []MandelColor
+	cp            ctlprint.CtlPrint
 }
 
 /*
@@ -284,7 +287,7 @@ func (m *Mandel) AdjustPreview(delta_x, delta_y, delta_span float64) {
 func (m *Mandel) AdjustZoom(adj float64) {
 	center_x := m.min_x + (m.span / 2.0)
 	center_y := m.min_y + (m.span / 2.0)
-	DbgPrint("center_x:%f,center_y:%f\n", center_x, center_y)
+	m.cp.DbgPrint("center_x:%f,center_y:%f\n", center_x, center_y)
 	// Reduce span
 	m.span = m.span * adj
 	m.span_one_dot = m.span / float64(m.size)
@@ -293,7 +296,7 @@ func (m *Mandel) AdjustZoom(adj float64) {
 	m.min_y = center_y - (m.span / 2.0)
 }
 
-func NewMandel(min_x, min_y, span float64, size, color_theme_num int) Mandel {
+func NewMandel(min_x, min_y, span float64, size, color_theme_num int, cp ctlprint.CtlPrint) Mandel {
 	//	var lcl_all_colors []MandelColor
 	m := Mandel{
 		size:            size,
@@ -317,6 +320,7 @@ func NewMandel(min_x, min_y, span float64, size, color_theme_num int) Mandel {
 		cur_h: size,
 		// Color
 		cur_color_num: color_theme_num,
+		cp:            cp,
 	}
 	m.span_one_dot = m.span / float64(m.size)
 	m.tiles = make([][]Color, MAX_DISPLAY_SIZE)
