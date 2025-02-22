@@ -4,7 +4,6 @@ import (
 	"github.com/craig-warner/mandelbrot-background/pkg/ctlprint"
 
 	"bytes"
-	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -32,26 +31,6 @@ const (
 	MAX_DISPLAY_SIZE = 10000
 	MAX_IMAGES       = 256
 )
-
-/*
-func DbgPrint(str ...interface{}) {
-	if DEBUG {
-		fmt.Println(str...)
-		return
-	}
-}
-*/
-
-/*
-type tappableRaster struct {
-	fyne.CanvasObject
-	OnTapped func()
-}
-
-func NewTappableRaster(raster fyne.CanvasObject, onTapped func()) *tappableRaster {
-	return &tappableRaster{CanvasObject: raster, OnTapped: onTapped}
-}
-*/
 
 func NewPoint(set_x, set_y float64) Point {
 	p := Point{
@@ -125,7 +104,7 @@ func main() {
 	//		fmt.Println("In Generate Background")
 	//	})
 	menuItemQuit := fyne.NewMenuItem("Quit", func() {
-		//fmt.Println("In DoQuit:")
+		cp.InfoPrint("In DoQuit:")
 		os.Exit(0)
 	})
 	//	menuControl:= fyne.NewMenu("Control", menuItemColor, menuItemZoom, menuItemQuit);
@@ -154,9 +133,7 @@ func main() {
 	selectBackgroundTemplateText := canvas.NewText("Select a background temple", color.Black)
 	selectBackgroundTemplateChoicesStrings := bg.GetTemplateChoicesStrings()
 	selectBackgroundTemplateChoices := widget.NewSelect(selectBackgroundTemplateChoicesStrings, func(s string) {
-		if DEBUG {
-			fmt.Println("Select Background Template Callback:", s)
-		}
+		cp.DbgPrint("Select Background Template Callback:", s)
 		for i := 0; i < len(selectBackgroundTemplateChoicesStrings); i++ {
 			if selectBackgroundTemplateChoicesStrings[i] == s {
 				// New Template
@@ -173,9 +150,7 @@ func main() {
 	selectDesktopSizeText := canvas.NewText("Select your desktop size ", color.Black)
 	selectDesktopSizeChoicesStrings := bg.GetDesktopChiocesStrings()
 	selectDesktopSizeChoices := widget.NewSelect(selectDesktopSizeChoicesStrings, func(s string) {
-		if DEBUG {
-			fmt.Println("Select Desktop Size Callback:", s)
-		}
+		cp.DbgPrint("Select Desktop Size Callback:", s)
 		for i := 0; i < len(selectDesktopSizeChoicesStrings); i++ {
 			if selectDesktopSizeChoicesStrings[i] == s {
 				bg.desktop_num = i
@@ -188,9 +163,7 @@ func main() {
 	selectColorPreferenceText := canvas.NewText("Select your color preference", color.Black)
 	selectColorPreferenceChoicesStrings := bg.GetColorChiocesStrings()
 	selectColorPreferenceChoices := widget.NewSelect(selectColorPreferenceChoicesStrings, func(s string) {
-		if DEBUG {
-			fmt.Println("Select Color Preference Callback:", s)
-		}
+		cp.DbgPrint("Select Color Preference Callback:", s)
 		for i := 0; i < len(selectColorPreferenceChoicesStrings); i++ {
 			if selectColorPreferenceChoicesStrings[i] == s {
 				bg.color_theme_num = i
@@ -206,9 +179,7 @@ func main() {
 	zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
 	zoomMagnificationSlider.SetValue(2.0)
 	zoomMagnificationSlider.OnChanged = func(f float64) {
-		if DEBUG {
-			fmt.Println("Zoom Magnification Callback:", f)
-		}
+		cp.DbgPrint("Zoom Magnification Callback:", f)
 		bg.zoom_magnification = int(f)
 	}
 	//zoomInText := canvas.NewText("Zoom in", color.Black)
@@ -226,9 +197,7 @@ func main() {
 	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider)
 
 	panCheckBox := widget.NewCheck("Fine Grained Pan", func(b bool) {
-		if DEBUG {
-			fmt.Println("Zoom In Callback:", b)
-		}
+		cp.DbgPrint("Zoom In Callback:", b)
 		if b {
 			bg.pan_speed = 0.01
 		} else {
@@ -241,9 +210,7 @@ func main() {
 	addImageBtn := widget.NewButton("Add Image", func() {
 		// Check
 		if bg.image_defined >= bg.TotalImages() {
-			if DEBUG {
-				fmt.Println("Too many images defined")
-			}
+			cp.ErrorPrint("Too many images defined")
 			var popup *widget.PopUp
 			all_defined_label := widget.NewLabel("All Images Already Defined")
 			popUpContent := container.NewVBox(
@@ -256,9 +223,7 @@ func main() {
 			popup.Show()
 			return
 		}
-		if DEBUG {
-			fmt.Println("Add Image")
-		}
+		cp.InfoPrint("Add Image")
 		bg.image_defined++
 		zoomPathString = bg.PathImageString()
 		zoomPathLabel.SetText(zoomPathString)
@@ -266,15 +231,10 @@ func main() {
 		bg.all_min_x[bg.image_defined] = myMandel.min_x
 		bg.all_min_y[bg.image_defined] = myMandel.min_y
 		bg.all_span[bg.image_defined] = myMandel.span
-		if DEBUG {
-			fmt.Printf("zoomPathString: %d", bg.image_defined)
-		}
-		// FIXME: Add Image
+		cp.DbgPrint("zoomPathString: %d", bg.image_defined)
 	})
 	resetPathBtn := widget.NewButton("Reset", func() {
-		if DEBUG {
-			fmt.Println("Reset")
-		}
+		cp.InfoPrint("Reset")
 		bg.image_defined = 0
 		myMandel.ResetSpan()
 		myMandel.up_to_date = false
@@ -311,39 +271,27 @@ func main() {
 
 	panControlContent := container.New(layout.NewHBoxLayout())
 	panUpBtn := widget.NewButton("Up", func() {
-		if DEBUG {
-			fmt.Println("Up")
-		}
+		cp.DbgPrint("Up")
 		bg.PanUp(&myMandel)
 	})
 	panDownBtn := widget.NewButton("Down", func() {
-		if DEBUG {
-			fmt.Println("Down")
-		}
+		cp.DbgPrint("Down")
 		bg.PanDown(&myMandel)
 	})
 	panLeftBtn := widget.NewButton("Left", func() {
-		if DEBUG {
-			fmt.Println("Left")
-		}
+		cp.DbgPrint("Left")
 		bg.PanLeft(&myMandel)
 	})
 	panRightBtn := widget.NewButton("Right", func() {
-		if DEBUG {
-			fmt.Println("Right")
-		}
+		cp.DbgPrint("Right")
 		bg.PanRight(&myMandel)
 	})
 	panZoomInBtn := widget.NewButton("Zoom In", func() {
-		if DEBUG {
-			fmt.Println("Zoom In")
-		}
+		cp.DbgPrint("Zoom In")
 		bg.PanZoomIn(&myMandel)
 	})
 	panZoomOutBtn := widget.NewButton("Zoom Out", func() {
-		if DEBUG {
-			fmt.Println("Zoom In")
-		}
+		cp.DbgPrint("Zoom Out")
 		bg.PanZoomOut(&myMandel)
 	})
 	panControlContent.Add(panUpBtn)
@@ -368,9 +316,7 @@ func main() {
 	generateBtn := widget.NewButton("Generate Background", func() {
 		// Check
 		if bg.image_defined != bg.TotalImages() {
-			if DEBUG {
-				fmt.Println("Location for all images is not defined")
-			}
+			cp.InfoPrint("Location for all images is not defined")
 			var popup *widget.PopUp
 			all_defined_label := widget.NewLabel("Location for all images is not defined")
 			popUpContent := container.NewVBox(
@@ -383,13 +329,9 @@ func main() {
 			popup.Show()
 			return
 		}
-		if DEBUG {
-			fmt.Println("Generate Background")
-		}
+		cp.DonePrint("Generate Background")
 		mbg_image := image.NewRGBA(image.Rect(0, 0, bg.desktop_x_dots[bg.desktop_num], bg.desktop_y_dots[bg.desktop_num]))
-		if DEBUG {
-			fmt.Println("Making Black")
-		}
+		cp.DbgPrint("Making Black")
 		for px := 0; px < bg.desktop_x_dots[bg.desktop_num]; px++ {
 			for py := 0; py < bg.desktop_y_dots[bg.desktop_num]; py++ {
 				mbg_image.Set(px, py, color.RGBA{0x0, 0x0, 0x0, 0xff})
@@ -412,7 +354,6 @@ func main() {
 				if new_mandelbrot.up_to_date {
 					break
 				} else {
-					//fmt.Print(".")
 					new_mandelbrot.UpdateSome()
 				}
 			}
@@ -434,7 +375,7 @@ func main() {
 		//default_file_name_save := "mbg"+ ".png"
 		file_name_save := dialog.NewFileSave(func(uc fyne.URIWriteCloser, err error) {
 			if err != nil {
-				fmt.Println("Error in Save")
+				cp.ErrorPrint("Error in Save")
 				return
 			}
 
@@ -447,7 +388,7 @@ func main() {
 			err_png := png.Encode(buf, mbg_image)
 			png_bytes := buf.Bytes()
 			if err_png != nil {
-				fmt.Println("Error in Save: Converting")
+				cp.ErrorPrint("Error in Save: Converting")
 				return
 			}
 
@@ -469,8 +410,7 @@ func main() {
 		save_filename := bg.templates[bg.template_num].Save_filename + ".png"
 		file_name_save.SetFileName(save_filename)
 		file_name_save.SetOnClosed(func() {
-			//fmt.Println("Save Closed")
-			cp.VerbosePrint("Save Closed")
+			cp.InfoPrint("Save Closed")
 		})
 		file_name_save.Show()
 	})
@@ -503,7 +443,6 @@ func main() {
 
 	go func() {
 		for {
-			//fmt.Println(myMandel)
 			if !myMandel.up_to_date {
 				myMandel.UpdateSome()
 				myRaster.Refresh()

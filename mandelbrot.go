@@ -4,7 +4,6 @@ import (
 	"github.com/craig-warner/mandelbrot-background/pkg/ctlprint"
 
 	"encoding/json"
-	"fmt"
 	"image/color"
 )
 
@@ -121,7 +120,7 @@ func (m *Mandel) CalcOneDot() {
 func (m *Mandel) AdvanceToNextDot() {
 	// DEBUG
 	//fmt.Printf("AdvanceToNextDot %+v", m)
-	//fmt.Printf("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
+	m.cp.DbgPrint("AdvanceToNextDot cur_x:%d, cur_y:%d,size:%d,cur_gran:%d", m.cur_x, m.cur_y, m.size, m.cur_granularity)
 	if !m.up_to_date {
 		m.cur_x = (m.cur_x + m.cur_granularity) % m.size
 		if m.cur_x == 0 {
@@ -149,7 +148,7 @@ func (m *Mandel) ResetSpan() {
 func (m *Mandel) ResetWindow(w, h int) {
 	// Check
 	if (w > MAX_DISPLAY_SIZE) || (h > MAX_DISPLAY_SIZE) {
-		fmt.Println("Monitor is too big")
+		m.cp.ErrorPrint("Monitor is too big")
 		panic(1)
 	}
 	// New Window Size
@@ -246,7 +245,7 @@ func (m *Mandel) DrawOneDotNotBlack(use_px, use_py int) color.Color {
 }
 
 func (m *Mandel) Status() {
-	fmt.Println(m.up_to_date, m.cur_granularity, m.cur_x, m.cur_y)
+	m.cp.DbgPrint(m.up_to_date, m.cur_granularity, m.cur_x, m.cur_y)
 }
 
 func (m *Mandel) CalcBundleSize() int {
@@ -262,7 +261,7 @@ func (m *Mandel) UpdateSome() {
 	// Update one Dot and advance
 	bsize := m.CalcBundleSize()
 	for b := 0; b < bsize; b++ {
-		//	fmt.Printf("UpdateSome:b=%d,bsize=%d", b, bsize)
+		m.cp.DbgPrint("UpdateSome:b=%d,bsize=%d", b, bsize)
 		m.CalcOneDot()
 		m.AdvanceToNextDot()
 	}
@@ -329,7 +328,7 @@ func NewMandel(min_x, min_y, span float64, size, color_theme_num int, cp ctlprin
 	}
 	err := json.Unmarshal([]byte(all_colors_str), &m.all_colors)
 	if err != nil {
-		fmt.Printf("Unable to marshal JSON due to %s", err)
+		cp.ErrorPrint("Unable to marshal JSON due to %s", err)
 		panic(1)
 	}
 	return m
