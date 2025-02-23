@@ -77,14 +77,32 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 
 ## Enhancements
 * Image Format Selection
-* Add More Colors
+* Colors
+  * Add More Colors
+  * Color Preview
+  * Yellow, Orange, Pink, Iowa State Red
+* Math
+   * Output json of span, x, y
+   * Load pathfile
+   * Color for each image
+* Templates
+    * Preview
+    * Numbers
+    * More Templates
 * Stretch Progress Bar
-* Bigger Window
-* Remove Debug Print 
-* Add Documentation
+* Documentation
+    * Pop Up Window
+    * Pointer to PBS
+    * Mandelbrot math
 * Image Growth with Window Resize
 * Show Intermediate images
 * Allow color changes between images
+* Android
+   * Test
+   * Save Test
+
+## Spin-offs
+* Controlled Info, Error Debug Print 
 
 ## Go Code Enhacements
 * Multiple files 
