@@ -93,34 +93,8 @@ func main() {
 	myWindow := myApp.NewWindow("Mandelbrot Background")
 	myWindow.SetPadded(false)
 
-	// Resize ignored by Mobile Platforms
-	// - Mobile platforms are always full screen
-	// - 27 is a hack determined by Ubuntu/Gnome
-	//myWindow.Resize(fyne.NewSize(256, (256 + 27)))
-	myWindow.Resize(fyne.NewSize(WINDOW_SIZE, (WINDOW_SIZE + 27)))
-
-	// Control Menu Set up
-	//	menuItemGenerate := fyne.NewMenuItem("Generate Background", func() {
-	//		fmt.Println("In Generate Background")
-	//	})
-	menuItemQuit := fyne.NewMenuItem("Quit", func() {
-		cp.InfoPrint("In DoQuit:")
-		os.Exit(0)
-	})
-	//	menuControl:= fyne.NewMenu("Control", menuItemColor, menuItemZoom, menuItemQuit);
-	//menuControl := fyne.NewMenu("Control", menuItemGenerate, menuItemQuit)
-	menuControl := fyne.NewMenu("Control", menuItemQuit)
-	// About Menu Set up
-	menuItemAbout := fyne.NewMenuItem("About...", func() {
-		dialog.ShowInformation("About Mandelbrot Background v1.0.0", "Author: Craig Warner \n\ngithub.com/craig-warner/mandelbrot-background", myWindow)
-	})
-	menuHelp := fyne.NewMenu("Help ", menuItemAbout)
-	mainMenu := fyne.NewMainMenu(menuControl, menuHelp)
-	myWindow.SetMainMenu(mainMenu)
-
 	// Background
 	bg := NewBackground(cp)
-
 	// Mandelbrot
 	myMandel := NewMandel(-1.0, -1.5, 3.0, 256, 0, cp)
 	myMandel.ResetSpan()
@@ -128,83 +102,175 @@ func main() {
 	// Raster
 	myRaster := canvas.NewRasterWithPixels(myMandel.DrawOneDot)
 
+	// Resize ignored by Mobile Platforms
+	// - Mobile platforms are always full screen
+	// - 27 is a hack determined by Ubuntu/Gnome
+	//myWindow.Resize(fyne.NewSize(256, (256 + 27)))
+	myWindow.Resize(fyne.NewSize(WINDOW_SIZE, (WINDOW_SIZE + 27)))
+
+	// Control Menu Set up
+	menuItemTemplate := fyne.NewMenuItem("Template Settings", func() {
+		cp.InfoPrint("In Template Settings")
+		var popup *widget.PopUp
+		new_template_num := 0
+		selectBackgroundTemplateText := widget.NewLabel("Select a background temple")
+		selectBackgroundTemplateChoicesStrings := bg.GetTemplateChoicesStrings()
+		selectBackgroundTemplateChoices := widget.NewSelect(selectBackgroundTemplateChoicesStrings, func(s string) {
+			cp.DbgPrint("Select Background Template Callback:", s)
+			for i := 0; i < len(selectBackgroundTemplateChoicesStrings); i++ {
+				if selectBackgroundTemplateChoicesStrings[i] == s {
+					// New Template
+					new_template_num = i
+					break
+				}
+			}
+		})
+		selectBackgroundTemplateChoices.SetSelectedIndex(bg.template_num)
+		popUpContent := container.NewVBox(
+			selectBackgroundTemplateText,
+			selectBackgroundTemplateChoices,
+			container.NewHBox(
+				widget.NewButton("Ok", func() {
+					bg.template_num = new_template_num
+					bg.image_defined = 0
+					zoomPathString = bg.PathImageString()
+					zoomPathLabel.SetText(zoomPathString)
+					popup.Hide()
+
+				}),
+				widget.NewButton("Cancel", func() {
+					popup.Hide()
+				}),
+			),
+		)
+		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+		popup.Show()
+	})
+	menuItemDesktop := fyne.NewMenuItem("Desktop Settings", func() {
+		cp.InfoPrint("In Desktop Settings")
+		var popup *widget.PopUp
+		new_desktop_num := 0
+		selectDesktopSizeText := widget.NewLabel("Select a background temple")
+		selectDesktopSizeChoicesStrings := bg.GetDesktopChiocesStrings()
+		selectDesktopSizeChoices := widget.NewSelect(selectDesktopSizeChoicesStrings, func(s string) {
+			cp.DbgPrint("Select Desktop Size Callback:", s)
+			for i := 0; i < len(selectDesktopSizeChoicesStrings); i++ {
+				if selectDesktopSizeChoicesStrings[i] == s {
+					new_desktop_num = i
+					break
+				}
+			}
+		})
+		selectDesktopSizeChoices.SetSelectedIndex(bg.desktop_num)
+		popUpContent := container.NewVBox(
+			selectDesktopSizeText,
+			selectDesktopSizeChoices,
+			container.NewHBox(
+				widget.NewButton("Ok", func() {
+					bg.desktop_num = new_desktop_num
+					popup.Hide()
+
+				}),
+				widget.NewButton("Cancel", func() {
+					popup.Hide()
+				}),
+			),
+		)
+		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+		popup.Show()
+	})
+	menuItemColor := fyne.NewMenuItem("Color Settings", func() {
+		cp.InfoPrint("In Color Settings")
+		var popup *widget.PopUp
+		new_color_num := 0
+		selectColorPreferenceText := widget.NewLabel("Select your color preference")
+		selectColorPreferenceChoicesStrings := bg.GetColorChiocesStrings()
+		selectColorPreferenceChoices := widget.NewSelect(selectColorPreferenceChoicesStrings, func(s string) {
+			cp.DbgPrint("Select Color Preference Callback:", s)
+			for i := 0; i < len(selectColorPreferenceChoicesStrings); i++ {
+				if selectColorPreferenceChoicesStrings[i] == s {
+					new_color_num = i
+					break
+				}
+			}
+		})
+		selectColorPreferenceChoices.SetSelectedIndex(bg.color_theme_num)
+		popUpContent := container.NewVBox(
+			selectColorPreferenceText,
+			selectColorPreferenceChoices,
+			container.NewHBox(
+				widget.NewButton("Ok", func() {
+					bg.color_theme_num = new_color_num
+					myMandel.SetColorTheme(bg.color_theme_num)
+					myRaster.Refresh()
+					popup.Hide()
+
+				}),
+				widget.NewButton("Cancel", func() {
+					popup.Hide()
+				}),
+			),
+		)
+		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+		popup.Show()
+	})
+	menuItemPanZoom := fyne.NewMenuItem("Pan and Zoom Settings", func() {
+		cp.InfoPrint("In Pan and Zoom Settings")
+		var popup *widget.PopUp
+		new_fine_grain_pan := false
+		new_zoom := 0.0
+		zoomMagnificationText := widget.NewLabel("Zoom in Magnification (1x to 2x)")
+		zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
+		zoomMagnificationSlider.SetValue(2.0)
+		zoomMagnificationSlider.OnChanged = func(f float64) {
+			cp.DbgPrint("Zoom Magnification Callback:", f)
+			new_zoom = f
+		}
+		panCheckBox := widget.NewCheck("Fine Grained Pan", func(b bool) {
+			cp.DbgPrint("Zoom In Callback:", b)
+			new_fine_grain_pan = b
+		})
+		panCheckBox.SetChecked(true)
+		popUpContent := container.NewVBox(
+			zoomMagnificationText,
+			zoomMagnificationSlider,
+			panCheckBox,
+			container.NewHBox(
+				widget.NewButton("Ok", func() {
+					bg.zoom_magnification = int(new_zoom)
+					// fine grain pan
+					if new_fine_grain_pan {
+						bg.pan_speed = 0.01
+					} else {
+						bg.pan_speed = 0.1
+					}
+					popup.Hide()
+				}),
+				widget.NewButton("Cancel", func() {
+					popup.Hide()
+				}),
+			),
+		)
+		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+		popup.Show()
+	})
+	menuItemQuit := fyne.NewMenuItem("Quit", func() {
+		cp.InfoPrint("In DoQuit:")
+		os.Exit(0)
+	})
+	//	menuControl:= fyne.NewMenu("Control", menuItemColor, menuItemZoom, menuItemQuit);
+	//menuControl := fyne.NewMenu("Control", menuItemGenerate, menuItemQuit)
+	menuControl := fyne.NewMenu("Control", menuItemTemplate, menuItemDesktop, menuItemColor,
+		menuItemPanZoom, menuItemQuit)
+	// About Menu Set up
+	menuItemAbout := fyne.NewMenuItem("About...", func() {
+		dialog.ShowInformation("About Mandelbrot Background v1.1.0", "Author: Craig Warner \n\ngithub.com/craig-warner/mandelbrot-background", myWindow)
+	})
+	menuHelp := fyne.NewMenu("Help ", menuItemAbout)
+	mainMenu := fyne.NewMainMenu(menuControl, menuHelp)
+	myWindow.SetMainMenu(mainMenu)
+
 	// Content
-
-	selectBackgroundTemplateText := canvas.NewText("Select a background temple", color.Black)
-	selectBackgroundTemplateChoicesStrings := bg.GetTemplateChoicesStrings()
-	selectBackgroundTemplateChoices := widget.NewSelect(selectBackgroundTemplateChoicesStrings, func(s string) {
-		cp.DbgPrint("Select Background Template Callback:", s)
-		for i := 0; i < len(selectBackgroundTemplateChoicesStrings); i++ {
-			if selectBackgroundTemplateChoicesStrings[i] == s {
-				// New Template
-				bg.template_num = i
-				bg.image_defined = 0
-				zoomPathString = bg.PathImageString()
-				zoomPathLabel.SetText(zoomPathString)
-				break
-			}
-		}
-	})
-	selectBackgroundTemplateChoices.SetSelectedIndex(0)
-
-	selectDesktopSizeText := canvas.NewText("Select your desktop size ", color.Black)
-	selectDesktopSizeChoicesStrings := bg.GetDesktopChiocesStrings()
-	selectDesktopSizeChoices := widget.NewSelect(selectDesktopSizeChoicesStrings, func(s string) {
-		cp.DbgPrint("Select Desktop Size Callback:", s)
-		for i := 0; i < len(selectDesktopSizeChoicesStrings); i++ {
-			if selectDesktopSizeChoicesStrings[i] == s {
-				bg.desktop_num = i
-				break
-			}
-		}
-	})
-	selectDesktopSizeChoices.SetSelectedIndex(0)
-
-	selectColorPreferenceText := canvas.NewText("Select your color preference", color.Black)
-	selectColorPreferenceChoicesStrings := bg.GetColorChiocesStrings()
-	selectColorPreferenceChoices := widget.NewSelect(selectColorPreferenceChoicesStrings, func(s string) {
-		cp.DbgPrint("Select Color Preference Callback:", s)
-		for i := 0; i < len(selectColorPreferenceChoicesStrings); i++ {
-			if selectColorPreferenceChoicesStrings[i] == s {
-				bg.color_theme_num = i
-				myMandel.SetColorTheme(bg.color_theme_num)
-				myRaster.Refresh()
-				break
-			}
-		}
-	})
-	selectColorPreferenceChoices.SetSelectedIndex(0)
-
-	zoomMagnificationText := canvas.NewText("Zoom in Magnification (1x to 2x)", color.Black)
-	zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
-	zoomMagnificationSlider.SetValue(2.0)
-	zoomMagnificationSlider.OnChanged = func(f float64) {
-		cp.DbgPrint("Zoom Magnification Callback:", f)
-		bg.zoom_magnification = int(f)
-	}
-	//zoomInText := canvas.NewText("Zoom in", color.Black)
-	//zoomInCheckBox := widget.NewCheck("Zoom In", func(b bool) {
-	//	fmt.Println("Zoom In Callback:", b)
-	//	bg.zoom_in = b
-	//})
-	//zoomInCheckBox.SetChecked(true)
-	//zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomInText, zoomInCheckBox)
-
-	//zoomMagString = bg.PathImageString()
-	//zoomMagLabel.SetText(zoomPathString)
-
-	//zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider, zoomMagLabel)
-	zoomContent := container.New(layout.NewHBoxLayout(), zoomMagnificationText, zoomMagnificationSlider)
-
-	panCheckBox := widget.NewCheck("Fine Grained Pan", func(b bool) {
-		cp.DbgPrint("Zoom In Callback:", b)
-		if b {
-			bg.pan_speed = 0.01
-		} else {
-			bg.pan_speed = 0.1
-		}
-	})
-	panCheckBox.SetChecked(true)
 
 	addResetContent := container.New(layout.NewHBoxLayout())
 	addImageBtn := widget.NewButton("Add Image", func() {
@@ -251,18 +317,18 @@ func main() {
 	// Column One
 	//colOneContent := container.New(layout.NewVBoxLayout())
 	//colOneContent.Add(widthCtlText)
-	colOneContent.Add(selectBackgroundTemplateText)
-	colOneContent.Add(selectBackgroundTemplateChoices)
-	colOneContent.Add(selectDesktopSizeText)
-	colOneContent.Add(selectDesktopSizeChoices)
-	colOneContent.Add(selectColorPreferenceText)
-	colOneContent.Add(selectColorPreferenceChoices)
-	colOneContent.Add(zoomContent)
-	colOneContent.Add(panCheckBox)
+	//colOneContent.Add(selectBackgroundTemplateText)
+	//colOneContent.Add(selectBackgroundTemplateChoices)
+	//colOneContent.Add(selectDesktopSizeText)
+	//colOneContent.Add(selectDesktopSizeChoices)
+	//colOneContent.Add(selectColorPreferenceText)
+	//colOneContent.Add(selectColorPreferenceChoices)
+	//colOneContent.Add(zoomContent)
+	//colOneContent.Add(panCheckBox)
 	colOneContent.Add(addResetContent)
 	colOneContent.Add(zoomPathLabel)
 
-	previewText := canvas.NewText("Preview", color.Black)
+	//	previewText := canvas.NewText("Preview", color.Black)
 	myRaster.SetMinSize(fyne.NewSize(256, 256))
 	previewContent := container.New(layout.NewHBoxLayout())
 	previewContent.Add(layout.NewSpacer())
@@ -300,13 +366,6 @@ func main() {
 	panControlContent.Add(panRightBtn)
 	panControlContent.Add(panZoomInBtn)
 	panControlContent.Add(panZoomOutBtn)
-
-	colTwoContent := container.New(layout.NewVBoxLayout())
-	colTwoContent.Add(layout.NewSpacer())
-	colTwoContent.Add(previewText)
-	colTwoContent.Add(previewContent)
-	colTwoContent.Add(panControlContent)
-	colTwoContent.Add(layout.NewSpacer())
 
 	// Botton Content Creation
 	imageGenerationProgressBar := widget.NewProgressBar()
@@ -423,13 +482,21 @@ func main() {
 	imageGenerationProgrogressContent.Add(imageGenerationProgressText)
 	imageGenerationProgrogressContent.Add(imageGenerationProgressBar)
 
-	colOneContent.Add(generateBtn)
-	colOneContent.Add(backgroundProgrogressContent)
-	colOneContent.Add(imageGenerationProgrogressContent)
+	colTwoContent := container.New(layout.NewVBoxLayout())
+	colTwoContent.Add(layout.NewSpacer())
+	//	colTwoContent.Add(previewText)
+	colTwoContent.Add(previewContent)
+	colTwoContent.Add(panControlContent)
+	colTwoContent.Add(addResetContent)
+	colTwoContent.Add(zoomPathLabel)
+	colTwoContent.Add(generateBtn)
+	colTwoContent.Add(backgroundProgrogressContent)
+	colTwoContent.Add(imageGenerationProgrogressContent)
+	colTwoContent.Add(layout.NewSpacer())
 
 	topContent := container.New(layout.NewHBoxLayout())
 	topContent.Add(layout.NewSpacer())
-	topContent.Add(colOneContent)
+	//topContent.Add(colOneContent)
 	topContent.Add(colTwoContent)
 	topContent.Add(layout.NewSpacer())
 
