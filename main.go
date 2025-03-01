@@ -22,9 +22,11 @@ import (
 )
 
 const VERBOSE = false
-const DEBUG = false
+const DEBUG = true
 
 const WINDOW_SIZE = 512
+const COLOR_PREVIEW_SIZE = 64
+const PREVIEW_SIZE = 256
 
 // const WINDOW_SIZE = 1024
 const (
@@ -96,9 +98,9 @@ func main() {
 	// Background
 	bg := NewBackground(cp)
 	// Mandelbrot
-	myMandel := NewMandel(-1.0, -1.5, 3.0, 256, 0, cp)
+	myMandel := NewMandel(-1.0, -1.5, 3.0, PREVIEW_SIZE, 0, cp)
 	myMandel.ResetSpan()
-	myMandel.ResetWindow(256, 256)
+	myMandel.ResetWindow(PREVIEW_SIZE, PREVIEW_SIZE)
 	// Raster
 	myRaster := canvas.NewRasterWithPixels(myMandel.DrawOneDot)
 
@@ -130,6 +132,7 @@ func main() {
 			selectBackgroundTemplateText,
 			selectBackgroundTemplateChoices,
 			container.NewHBox(
+				layout.NewSpacer(),
 				widget.NewButton("Ok", func() {
 					bg.template_num = new_template_num
 					bg.image_defined = 0
@@ -141,6 +144,7 @@ func main() {
 				widget.NewButton("Cancel", func() {
 					popup.Hide()
 				}),
+				layout.NewSpacer(),
 			),
 		)
 		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
@@ -166,6 +170,7 @@ func main() {
 			selectDesktopSizeText,
 			selectDesktopSizeChoices,
 			container.NewHBox(
+				layout.NewSpacer(),
 				widget.NewButton("Ok", func() {
 					bg.desktop_num = new_desktop_num
 					popup.Hide()
@@ -174,15 +179,26 @@ func main() {
 				widget.NewButton("Cancel", func() {
 					popup.Hide()
 				}),
+				layout.NewSpacer(),
 			),
 		)
 		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
 		popup.Show()
 	})
+	// Color Menu Set up
 	menuItemColor := fyne.NewMenuItem("Color Settings", func() {
 		cp.InfoPrint("In Color Settings")
 		var popup *widget.PopUp
 		new_color_num := 0
+		// Color Preview Mandel
+		selectColorPreviewMandel := NewMandel(-1.0, -1.5, 3.0, COLOR_PREVIEW_SIZE, 0, cp)
+		selectColorPreviewMandel.ResetSpan()
+		selectColorPreviewMandel.ResetWindow(COLOR_PREVIEW_SIZE, COLOR_PREVIEW_SIZE)
+		selectColorPreviewMandel.SetColorTheme(bg.color_theme_num)
+		selectColorPreviewMandel.UpdateAll()
+		// Color Preview Raster
+		selectColorPreviewRaster := canvas.NewRasterWithPixels(selectColorPreviewMandel.DrawOneDot)
+		selectColorPreviewRaster.SetMinSize(fyne.NewSize(COLOR_PREVIEW_SIZE, COLOR_PREVIEW_SIZE))
 		selectColorPreferenceText := widget.NewLabel("Select your color preference")
 		selectColorPreferenceChoicesStrings := bg.GetColorChiocesStrings()
 		selectColorPreferenceChoices := widget.NewSelect(selectColorPreferenceChoicesStrings, func(s string) {
@@ -190,15 +206,24 @@ func main() {
 			for i := 0; i < len(selectColorPreferenceChoicesStrings); i++ {
 				if selectColorPreferenceChoicesStrings[i] == s {
 					new_color_num = i
+					selectColorPreviewMandel.SetColorTheme(new_color_num)
+					selectColorPreviewMandel.UpdateAll()
+					selectColorPreviewRaster.Refresh()
 					break
 				}
 			}
 		})
 		selectColorPreferenceChoices.SetSelectedIndex(bg.color_theme_num)
+		colorPreviewCenter := container.NewHBox(container.New(layout.NewHBoxLayout()))
+		colorPreviewCenter.Add(layout.NewSpacer())
+		colorPreviewCenter.Add(selectColorPreviewRaster)
+		colorPreviewCenter.Add(layout.NewSpacer())
 		popUpContent := container.NewVBox(
 			selectColorPreferenceText,
 			selectColorPreferenceChoices,
+			colorPreviewCenter,
 			container.NewHBox(
+				layout.NewSpacer(),
 				widget.NewButton("Ok", func() {
 					bg.color_theme_num = new_color_num
 					myMandel.SetColorTheme(bg.color_theme_num)
@@ -209,10 +234,12 @@ func main() {
 				widget.NewButton("Cancel", func() {
 					popup.Hide()
 				}),
+				layout.NewSpacer(),
 			),
 		)
 		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
 		popup.Show()
+		selectColorPreviewRaster.Refresh()
 	})
 	menuItemPanZoom := fyne.NewMenuItem("Pan and Zoom Settings", func() {
 		cp.InfoPrint("In Pan and Zoom Settings")
@@ -236,6 +263,7 @@ func main() {
 			zoomMagnificationSlider,
 			panCheckBox,
 			container.NewHBox(
+				layout.NewSpacer(),
 				widget.NewButton("Ok", func() {
 					bg.zoom_magnification = int(new_zoom)
 					// fine grain pan
@@ -249,6 +277,7 @@ func main() {
 				widget.NewButton("Cancel", func() {
 					popup.Hide()
 				}),
+				layout.NewSpacer(),
 			),
 		)
 		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())

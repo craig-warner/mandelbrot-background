@@ -36,21 +36,16 @@ sudo make install
  * GOHOME = /home/craigwarner
 ```
 %sudo apt install libgl1-mesa-dev xorg-dev
-go run -v main.go dict.go
 ```
 
 # Building .apk for Android Studio
 ## msys-x64
 ```
-fyne package -os android -appID com.example.mandelbrotbackground -icon assets/mandelbrot-background.png
-```
-```
-fyne package -os windows -icon assets/mandelbrot-back.png
+fyne package -os android -appID com.example.mandelbrotbackground -ic* Image Format Selection
 ```
  
 # Installing .apk to Android Studio
-Drag Mandelbrot_Background.apk to emulator icon
-
+Drag Mandelbrot_Background.apk to emulator ico* Image Format Selection
 # Installaion on Ubuntu 
 ## - Assumptions
  * GOHOME = /home/craigwarner
@@ -73,13 +68,14 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 
 ## Basic
 
-## Bub Fixes
+## Bug 
+* Generate Background Progress (image progress string)
 
 ## Enhancements
 * Image Format Selection
 * Colors
   * Add More Colors
-  * Color Preview
+  * Color Preview (DONE)
   * Yellow, Orange, Pink, Iowa State Red
 * Math
    * Output json of span, x, y

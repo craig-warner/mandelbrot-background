@@ -257,6 +257,10 @@ func (m *Mandel) PercentCalced() float64 {
 	return (float64(m.cur_y) / float64(m.size))
 }
 
+func (m *Mandel) Reset() {
+	m.up_to_date = false
+}
+
 func (m *Mandel) UpdateSome() {
 	// Update one Dot and advance
 	bsize := m.CalcBundleSize()
@@ -264,6 +268,12 @@ func (m *Mandel) UpdateSome() {
 		m.cp.DbgPrint("UpdateSome:b=%d,bsize=%d", b, bsize)
 		m.CalcOneDot()
 		m.AdvanceToNextDot()
+	}
+}
+
+func (m *Mandel) UpdateAll() {
+	for !m.up_to_date {
+		m.UpdateSome()
 	}
 }
 
