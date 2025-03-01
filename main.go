@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/craig-warner/mandelbrot-background/pkg/ctlprint"
 
 	"bytes"
@@ -98,7 +101,7 @@ func main() {
 	// Background
 	bg := NewBackground(cp)
 	// Mandelbrot
-	myMandel := NewMandel(-1.0, -1.5, 3.0, PREVIEW_SIZE, 0, cp)
+	myMandel := NewMandel(-1.0, -1.5, 3.0, PREVIEW_SIZE, 0, bg.threshold, cp)
 	myMandel.ResetSpan()
 	myMandel.ResetWindow(PREVIEW_SIZE, PREVIEW_SIZE)
 	// Raster
@@ -191,7 +194,7 @@ func main() {
 		var popup *widget.PopUp
 		new_color_num := 0
 		// Color Preview Mandel
-		selectColorPreviewMandel := NewMandel(-1.0, -1.5, 3.0, COLOR_PREVIEW_SIZE, 0, cp)
+		selectColorPreviewMandel := NewMandel(-1.0, -1.5, 3.0, COLOR_PREVIEW_SIZE, 0, bg.threshold, cp)
 		selectColorPreviewMandel.ResetSpan()
 		selectColorPreviewMandel.ResetWindow(COLOR_PREVIEW_SIZE, COLOR_PREVIEW_SIZE)
 		selectColorPreviewMandel.SetColorTheme(bg.color_theme_num)
@@ -244,20 +247,21 @@ func main() {
 	menuItemPanZoom := fyne.NewMenuItem("Pan and Zoom Settings", func() {
 		cp.InfoPrint("In Pan and Zoom Settings")
 		var popup *widget.PopUp
-		new_fine_grain_pan := false
-		new_zoom := 0.0
+		new_fine_grain_pan_setting := false
+		new_zoom := float64(bg.zoom_magnification)
 		zoomMagnificationText := widget.NewLabel("Zoom in Magnification (1x to 2x)")
 		zoomMagnificationSlider := widget.NewSlider(1.0, 10.0)
-		zoomMagnificationSlider.SetValue(2.0)
+		zoomMagnificationSlider.SetValue(float64(bg.zoom_magnification))
 		zoomMagnificationSlider.OnChanged = func(f float64) {
 			cp.DbgPrint("Zoom Magnification Callback:", f)
 			new_zoom = f
 		}
 		panCheckBox := widget.NewCheck("Fine Grained Pan", func(b bool) {
 			cp.DbgPrint("Zoom In Callback:", b)
-			new_fine_grain_pan = b
+			new_fine_grain_pan_setting = b
 		})
-		panCheckBox.SetChecked(true)
+		cp.DbgPrint("Fine Grain Pan Setting:", bg.fine_grain_pan)
+		panCheckBox.SetChecked(bg.fine_grain_pan)
 		popUpContent := container.NewVBox(
 			zoomMagnificationText,
 			zoomMagnificationSlider,
@@ -267,10 +271,55 @@ func main() {
 				widget.NewButton("Ok", func() {
 					bg.zoom_magnification = int(new_zoom)
 					// fine grain pan
-					if new_fine_grain_pan {
+					bg.fine_grain_pan = new_fine_grain_pan_setting
+					if new_fine_grain_pan_setting {
 						bg.pan_speed = 0.01
 					} else {
 						bg.pan_speed = 0.1
+					}
+					popup.Hide()
+				}),
+				widget.NewButton("Cancel", func() {
+					popup.Hide()
+				}),
+				layout.NewSpacer(),
+			),
+		)
+		popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+		popup.Show()
+	})
+	menuItemThreshold := fyne.NewMenuItem("Threshold Settings", func() {
+		cp.InfoPrint("In Threshold Settings")
+		var popup *widget.PopUp
+		thresholdText := widget.NewLabel("Mandebrot Color Calculation Threshold (1.0 to 10,0000.0)")
+		thresholdEntry := widget.NewEntry()
+		thresholdEntry.SetText(bg.GetThresholdString())
+		//thresholdEntry.OnChanged = func(s string) {
+		//	cp.DbgPrint("Threshold Entry Callback:", s)
+		//	new_threshold = true
+		//	new_theshold_value, _ = strconv.ParseFloat(s, 64)
+		//}
+		popUpContent := container.NewVBox(
+			thresholdText,
+			thresholdEntry,
+			container.NewHBox(
+				layout.NewSpacer(),
+				widget.NewButton("Ok", func() {
+					//new_threshold_string := thresholdEntry.SelectedText()
+					new_threshold_string := thresholdEntry.Text
+					cp.DbgPrint("Threshold Value String:", new_threshold_string)
+					new_theshold_value, err := strconv.ParseFloat(new_threshold_string, 64)
+					if err != nil {
+						cp.DbgPrint("Threshold Value Error")
+						bg.SetThreshold(10.0)
+						myMandel.SetThreshold(10.0)
+					} else {
+						// Check: One is the smallest threshold
+						if math.Abs(new_theshold_value) < 1.0 {
+							new_theshold_value = 1.0
+						}
+						bg.SetThreshold(math.Abs(new_theshold_value))
+						myMandel.SetThreshold(bg.threshold)
 					}
 					popup.Hide()
 				}),
@@ -290,7 +339,7 @@ func main() {
 	//	menuControl:= fyne.NewMenu("Control", menuItemColor, menuItemZoom, menuItemQuit);
 	//menuControl := fyne.NewMenu("Control", menuItemGenerate, menuItemQuit)
 	menuControl := fyne.NewMenu("Control", menuItemTemplate, menuItemDesktop, menuItemColor,
-		menuItemPanZoom, menuItemQuit)
+		menuItemPanZoom, menuItemThreshold, menuItemQuit)
 	// About Menu Set up
 	menuItemAbout := fyne.NewMenuItem("About...", func() {
 		dialog.ShowInformation("About Mandelbrot Background v1.1.0", "Author: Craig Warner \n\ngithub.com/craig-warner/mandelbrot-background", myWindow)
@@ -435,6 +484,7 @@ func main() {
 				bg.all_span[i_num],
 				bg.templates[bg.template_num].Images[i_num].Side_size*bg.PixelsPerUnit(),
 				bg.color_theme_num,
+				bg.threshold,
 				cp,
 			)
 			// update background progress bar

@@ -282,6 +282,11 @@ func (m *Mandel) SetColorTheme(color_theme_num int) {
 	m.cur_color_num = color_theme_num
 }
 
+func (m *Mandel) SetThreshold(threshold float64) {
+	m.up_to_date = false
+	m.threshold = threshold
+}
+
 func (m *Mandel) FetchOnePoint(px, py int) (r, g, b uint8) {
 	return m.tiles[px][py].red, m.tiles[px][py].green, m.tiles[px][py].blue
 }
@@ -305,7 +310,7 @@ func (m *Mandel) AdjustZoom(adj float64) {
 	m.min_y = center_y - (m.span / 2.0)
 }
 
-func NewMandel(min_x, min_y, span float64, size, color_theme_num int, cp ctlprint.CtlPrint) Mandel {
+func NewMandel(min_x, min_y, span float64, size, color_theme_num int, threshold float64, cp ctlprint.CtlPrint) Mandel {
 	//	var lcl_all_colors []MandelColor
 	m := Mandel{
 		size:            size,
@@ -317,7 +322,7 @@ func NewMandel(min_x, min_y, span float64, size, color_theme_num int, cp ctlprin
 		//span:      3.0,
 		span: span,
 		//threshold: 10000000.0,
-		threshold: 10.0,
+		threshold: threshold,
 		//		min_x:     -1.0,
 		min_x: min_x,
 		//		max_x: 2.0,

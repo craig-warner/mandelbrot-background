@@ -148,6 +148,18 @@ const (
 	"green_pos":   [ -1, -1,   6,   7,  -1,  -1,  -1, -1,  6,  7,  -1, -1],
 	"red_pos":     [ -1, -1,  -1,  -1,   6,   7 , -1, -1, -1, -1,   6,  7],
 	"default_color": [0,0,0] 
+      },
+      { "Ibits": 12,
+	"blue_pos":   [ -1, -1,   6,   7,  -1,  -1,  -1, -1,  6,  7,  -1, -1],
+	"green_pos":    [  6,  7,  -1,  -1,  -1,  -1,  6,   7, -1,  -1, -1, -1],
+	"red_pos":     [ -1, -1,  -1,  -1,   6,   7 , -1, -1, -1, -1,   6,  7],
+	"default_color": [0,0,0] 
+	  },
+      { "Ibits": 12,
+	"blue_pos":     [  -1,  -1,  5,  6,   7,  -1,  -1,  -1,  5,  6,  -1, -1],
+	"green_pos":    [  -1,  -1, -1, -1,   5,   6,  -1,  -1, -1, -1,  5,  6],
+	"red_pos":      [   6,  7,   6,  7,   6,   7,   6,   7,  6,  7,  6,  7],
+	"default_color": [0,0,0] 
       }
     ]`
 
@@ -175,7 +187,9 @@ const (
 	    "Reverse Ocean",
 	    "All Pink",
 	    "Reverse Pink",
-	    "very bold: blue,green,red"
+	    "very bold: blue,green,red",
+	    "very bold: green,red, blue",
+	    "very bold: red,magenta,yellow"
 	]`
 )
 

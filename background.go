@@ -204,11 +204,12 @@ type Background struct {
 	desktop_num        int
 	color_theme_num    int
 	zoom_magnification int
-	zoom_in            bool
 	image_defined      int
 	//	cur_min_x          float64
 	//	cur_min_y          float64
 	//	cur_span           float64
+	threshold      float64
+	fine_grain_pan bool
 	pan_speed      float64
 	all_min_x      []float64
 	all_min_y      []float64
@@ -326,7 +327,16 @@ func (bg *Background) PanZoomIn(m *Mandel) {
 }
 func (bg *Background) PanZoomOut(m *Mandel) {
 	bg.AdjustPreview(m, 0.0, 0.0, 1.0+(float64(bg.zoom_magnification)/float64(10.0)))
+}
 
+func (bg *Background) SetThreshold(threshold float64) {
+	bg.threshold = threshold
+}
+
+func (bg *Background) GetThresholdString() string {
+	str := ""
+	str = fmt.Sprintf("%f", bg.threshold)
+	return str
 }
 
 func NewBackground(cp ctlprint.CtlPrint) Background {
@@ -335,13 +345,14 @@ func NewBackground(cp ctlprint.CtlPrint) Background {
 		desktop_num:        0,
 		color_theme_num:    0,
 		zoom_magnification: 1,
-		zoom_in:            true,
 		image_defined:      0,
 		//		cur_min_x:          -1.0,
 		//		cur_min_y:          -1.5,
 		//		cur_span:           3.0,
-		pan_speed: 0.1,
-		cp:        cp,
+		threshold:      10.0,
+		fine_grain_pan: true,
+		pan_speed:      0.1,
+		cp:             cp,
 	}
 	for i := 0; i < MAX_IMAGES; i++ {
 		bg.all_min_x = append(bg.all_min_x, float64(-1.0))

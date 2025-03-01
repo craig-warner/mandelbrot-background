@@ -69,8 +69,8 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 ## Basic
 
 ## Bug 
-* Generate Background Progress (image progress string)
-* Zoom / Pan Controll reset when selection popup is invoked
+* FIXED: Generate Background Progress (image progress string)
+* FIXED: Zoom / Pan Controll reset when selection popup is invoked
 
 ## Enhancements
 * Image Format Selection
@@ -82,7 +82,7 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
    * Output json of span, x, y
    * Load pathfile
    * Color for each image
-   * Threshold control
+   * Threshold control (DONE)
 * Templates
     * Preview
     * Numbers
