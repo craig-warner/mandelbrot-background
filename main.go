@@ -437,6 +437,8 @@ func main() {
 				bg.color_theme_num,
 				cp,
 			)
+			// update background progress bar
+			backgroundGenerationProgressBar.SetValue(float64(i_num) / float64(bg.TotalImages()))
 			for {
 				imageGenerationProgressBar.SetValue(new_mandelbrot.PercentCalced())
 				if new_mandelbrot.up_to_date {
@@ -455,9 +457,8 @@ func main() {
 			pos_x := bg.templates[bg.template_num].Images[i_num].Bg_x*pixels_per_unit + padx
 			pos_y := bg.templates[bg.template_num].Images[i_num].Bg_y*pixels_per_unit + pady
 			TranferMandelToImage(new_mandelbrot, mbg_image, pos_x, pos_y)
-			// update progress bar
-			backgroundGenerationProgressBar.SetValue(float64(i_num) / float64(bg.TotalImages()-1))
 		}
+		backgroundGenerationProgressBar.SetValue(float64(1.0))
 		// Save the image
 		//filename_save := bg.templates[bg.template_num].Name + ".bmp"
 		//default_file_name_save := "mbg"+ ".png"

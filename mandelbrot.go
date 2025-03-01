@@ -315,9 +315,9 @@ func NewMandel(min_x, min_y, span float64, size, color_theme_num int, cp ctlprin
 		up_to_date:      false,
 		// Math
 		//span:      3.0,
-		span:      span,
-		threshold: 10000000.0,
-		//threshold: 10.0,
+		span: span,
+		//threshold: 10000000.0,
+		threshold: 10.0,
 		//		min_x:     -1.0,
 		min_x: min_x,
 		//		max_x: 2.0,
