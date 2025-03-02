@@ -13,7 +13,7 @@ go run -v *.go
 # Building .apk for Android Studio
 ## msys-x64 
 ```
-fyne package -os android -appID com.example.mandelbrot-background-icon assets/mandelbrot-background.png
+fyne package -os android -appID com.example.mandelbrotbackground -icon assets/mandelbrot-background.png
 ```
 ## Installing .apk to Android Studio
 Drag Mandelbrot_Background.apk to emulator icon
