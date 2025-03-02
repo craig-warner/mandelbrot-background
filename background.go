@@ -46,6 +46,7 @@ const (
   		},
 		{
 		"version":"2.0",
+    	"num_images": 8,
 		"x_units": 16,
   		"y_units": 8,
   		"high_precision": false,
@@ -63,6 +64,7 @@ const (
 		},
 		{
 		"version":"2.0",
+    	"num_images": 11,
 		"x_units": 16,
   		"y_units": 8,
   		"high_precision": false,
@@ -97,6 +99,7 @@ const (
     		]
 		},
 		{
+    		"version": "2.0",
 			"num_images": 14,
   			"x_units": 32,
   			"y_units": 16,
@@ -176,9 +179,9 @@ const (
 		"Two (2 Images)",
 		"Three (3 Images)",
 		"Big Right (8 Images)",
-		"Big Right (11 Images)",
+		"Big Left (11 Images)",
 		"First Center (5 Images)",
-		"Big Right (14 Images)",
+		"Big Left (14 Images)",
 		"Big Center (17 Images)",
 		"Diagonal (17 Images)"
 	]`

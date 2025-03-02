@@ -84,8 +84,8 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
    * Color for each image
    * Threshold control (DONE)
 * Templates
-    * Preview
-    * Numbers
+    * Preview (DONE)
+    * Numbers (DONE)
     * More Templates
 * Stretch Progress Bar
 * Documentation

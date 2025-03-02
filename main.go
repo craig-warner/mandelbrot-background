@@ -29,6 +29,8 @@ const DEBUG = true
 
 const WINDOW_SIZE = 512
 const COLOR_PREVIEW_SIZE = 64
+const TEMPLATE_PREVIEW_SIZE_X = 256
+const TEMPLATE_PREVIEW_SIZE_Y = 180
 const PREVIEW_SIZE = 256
 
 // const WINDOW_SIZE = 1024
@@ -117,7 +119,7 @@ func main() {
 	menuItemTemplate := fyne.NewMenuItem("Template Settings", func() {
 		cp.InfoPrint("In Template Settings")
 		var popup *widget.PopUp
-		new_template_num := 0
+		new_template_num := bg.template_num
 		selectBackgroundTemplateText := widget.NewLabel("Select a background temple")
 		selectBackgroundTemplateChoicesStrings := bg.GetTemplateChoicesStrings()
 		selectBackgroundTemplateChoices := widget.NewSelect(selectBackgroundTemplateChoicesStrings, func(s string) {
@@ -130,10 +132,81 @@ func main() {
 				}
 			}
 		})
+		/*
+			// Template Preview
+			template_preview := container.NewWithoutLayout()
+			// Big Rectangle
+			rect := canvas.NewRectangle(color.Black)
+			rect.SetMinSize(fyne.NewSize(TEMPLATE_PREVIEW_SIZE, TEMPLATE_PREVIEW_SIZE))
+			template_preview.Add(rect)
+			cp.DbgPrint("TemplateNum:", bg.template_num)
+			// Image Numbers
+			units := TEMPLATE_PREVIEW_SIZE / bg.templates[bg.template_num].X_units
+			units_half := units / 2
+			cp.DbgPrint("Units:", units)
+			num_images := bg.templates[bg.template_num].Num_images
+			cp.DbgPrint("NumImages:", num_images)
+			for i := 0; i < num_images; i++ {
+				image_size := bg.templates[bg.template_num].Images[i].Side_size
+				// Calculate the x and y
+				pos_x := bg.templates[bg.template_num].Images[i].Bg_x*units + units_half*image_size
+				pos_y := bg.templates[bg.template_num].Images[i].Bg_y*units + units_half*image_size
+				image_num_str := strconv.Itoa(i)
+				image_num_text := canvas.NewText(image_num_str, color.Black)
+				template_preview.Add(image_num_text)
+				image_num_text.Move(fyne.NewPos(float32(pos_x), float32(pos_y)))
+				cp.DbgPrint("id:posx:posy:", i, pos_x, pos_y)
+			}
+			//MinSize(fyne.NewSize(TEMPLATE_PREVIEW_SIZE, TEMPLATE_PREVIEW_SIZE))
+			//template_preview := container.New(layout.NewAdaptiveGridLayout(3))
+			//template_preview.Add(rect)
+			//template_preview.Add(text1)
+			//template_preview.Add(text2)
+			//template_preview.Add(text3)
+			//template_preview.Add(text4)
+			//text1.Move(fyne.NewPos(10, 10))
+			//text2.Move(fyne.NewPos(20, 20))
+		*/
 		selectBackgroundTemplateChoices.SetSelectedIndex(bg.template_num)
 		popUpContent := container.NewVBox(
 			selectBackgroundTemplateText,
 			selectBackgroundTemplateChoices,
+			//template_preview,
+			widget.NewButton("See Template Image Order", func() {
+				var nested_popup *widget.PopUp
+				// Template Preview
+				template_preview := container.NewWithoutLayout()
+				// Big Rectangle
+				rect := canvas.NewRectangle(color.Black)
+				rect.SetMinSize(fyne.NewSize(TEMPLATE_PREVIEW_SIZE_X, TEMPLATE_PREVIEW_SIZE_Y))
+				template_preview.Add(rect)
+				cp.DbgPrint("TemplateNum:", new_template_num)
+				// Image Numbers
+				units := TEMPLATE_PREVIEW_SIZE_X / bg.templates[new_template_num].X_units
+				units_half := units / 2
+				cp.DbgPrint("Units:", units)
+				num_images := bg.templates[new_template_num].Num_images
+				cp.DbgPrint("NumImages:", num_images)
+				for i := 0; i < num_images; i++ {
+					image_size := bg.templates[new_template_num].Images[i].Side_size
+					// Calculate the x and y
+					pos_x := bg.templates[new_template_num].Images[i].Bg_x*units + units_half*image_size
+					pos_y := bg.templates[new_template_num].Images[i].Bg_y*units + units_half*image_size
+					image_num_str := strconv.Itoa(i)
+					image_num_text := canvas.NewText(image_num_str, color.Black)
+					template_preview.Add(image_num_text)
+					image_num_text.Move(fyne.NewPos(float32(pos_x), float32(pos_y)))
+					cp.DbgPrint("id:posx:posy:", i, pos_x, pos_y)
+				}
+				popUpContent := container.NewVBox(
+					template_preview,
+					widget.NewButton("Ok", func() {
+						nested_popup.Hide()
+					}),
+				)
+				nested_popup = widget.NewModalPopUp(popUpContent, myWindow.Canvas())
+				nested_popup.Show()
+			}),
 			container.NewHBox(
 				layout.NewSpacer(),
 				widget.NewButton("Ok", func() {
