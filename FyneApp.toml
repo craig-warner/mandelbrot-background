@@ -5,4 +5,4 @@ Website = "https://github.com/craig-warner/mandelbrot-background"
   Name = "Mandelbrot Background"
   ID = "com.warnerbits.mandelbrotbackground"
   Version = "1.0.0"
-  Build = 5
+  Build = 7

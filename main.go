@@ -21,6 +21,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -177,7 +178,7 @@ func main() {
 				// Template Preview
 				template_preview := container.NewWithoutLayout()
 				// Big Rectangle
-				rect := canvas.NewRectangle(color.Black)
+				rect := canvas.NewRectangle(theme.Color(theme.ColorNameBackground))
 				rect.SetMinSize(fyne.NewSize(TEMPLATE_PREVIEW_SIZE_X, TEMPLATE_PREVIEW_SIZE_Y))
 				template_preview.Add(rect)
 				cp.DbgPrint("TemplateNum:", new_template_num)
@@ -193,10 +194,19 @@ func main() {
 					pos_x := bg.templates[new_template_num].Images[i].Bg_x*units + units_half*image_size
 					pos_y := bg.templates[new_template_num].Images[i].Bg_y*units + units_half*image_size
 					image_num_str := strconv.Itoa(i)
-					image_num_text := canvas.NewText(image_num_str, color.Black)
+					image_num_text := canvas.NewText(image_num_str, theme.Color(theme.ColorNameForeground))
 					template_preview.Add(image_num_text)
 					image_num_text.Move(fyne.NewPos(float32(pos_x), float32(pos_y)))
 					cp.DbgPrint("id:posx:posy:", i, pos_x, pos_y)
+					/*
+						size := image_size * units
+						image_num_rect := canvas.NewRectangle(color.RGBA{R: 173, G: 100, B: 156, A: 200})
+						template_preview.Add(image_num_rect)
+						cp.DbgPrint("size:", i, size)
+						image_num_rect.SetMinSize(fyne.NewSize(float32(size), float32(size)))
+						image_num_rect.Move(fyne.NewPos(float32(pos_x), float32(pos_y)))
+						image_num_rect.Show()
+					*/
 				}
 				popUpContent := container.NewVBox(
 					template_preview,
@@ -626,11 +636,11 @@ func main() {
 		})
 		file_name_save.Show()
 	})
-	backgroundGenerationProgressText := canvas.NewText("Background Generation Progress", color.Black)
+	backgroundGenerationProgressText := canvas.NewText("Background Generation Progress", theme.Color(theme.ColorNameForeground))
 	backgroundProgrogressContent := container.New(layout.NewHBoxLayout())
 	backgroundProgrogressContent.Add(backgroundGenerationProgressText)
 	backgroundProgrogressContent.Add(backgroundGenerationProgressBar)
-	imageGenerationProgressText := canvas.NewText("Image Generation Progress", color.Black)
+	imageGenerationProgressText := canvas.NewText("Image Generation Progress", theme.Color(theme.ColorNameForeground))
 	imageGenerationProgrogressContent := container.New(layout.NewHBoxLayout())
 	imageGenerationProgrogressContent.Add(imageGenerationProgressText)
 	imageGenerationProgrogressContent.Add(imageGenerationProgressBar)
