@@ -214,10 +214,14 @@ type Background struct {
 	threshold      float64
 	fine_grain_pan bool
 	pan_speed      float64
+	// Path
 	all_min_x      []float64
 	all_min_y      []float64
 	all_span       []float64
-	templates      []Template
+	all_color_nums []int
+	// Templates
+	templates []Template
+	// All Mandels
 	images         []Mandel
 	desktop_x_dots []int
 	desktop_y_dots []int
@@ -361,6 +365,7 @@ func NewBackground(cp ctlprint.CtlPrint) Background {
 		bg.all_min_x = append(bg.all_min_x, float64(-1.0))
 		bg.all_min_y = append(bg.all_min_y, float64(-1.5))
 		bg.all_span = append(bg.all_span, float64(3.0))
+		bg.all_color_nums = append(bg.all_color_nums, 1)
 	}
 	// Read in all the templates
 	err := json.Unmarshal([]byte(all_template_str), &bg.templates)

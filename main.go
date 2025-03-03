@@ -26,7 +26,7 @@ import (
 )
 
 const VERBOSE = false
-const DEBUG = true
+const DEBUG = false
 
 const WINDOW_SIZE = 512
 const COLOR_PREVIEW_SIZE = 64
@@ -203,8 +203,8 @@ func main() {
 						image_num_rect := canvas.NewRectangle(color.RGBA{R: 173, G: 100, B: 156, A: 200})
 						template_preview.Add(image_num_rect)
 						cp.DbgPrint("size:", i, size)
-						image_num_rect.SetMinSize(fyne.NewSize(float32(size), float32(size)))
-						image_num_rect.Move(fyne.NewPos(float32(pos_x), float32(pos_y)))
+						image_num_rect.Resize(fyne.NewSize(float32(size), float32(size)))
+						image_num_rect.Move(fyne.NewPos(float32(pos_x-(size/2)), float32(pos_y-(size/2))))
 						image_num_rect.Show()
 					*/
 				}
@@ -451,13 +451,14 @@ func main() {
 			return
 		}
 		cp.InfoPrint("Add Image")
+		bg.all_min_x[bg.image_defined] = myMandel.min_x
+		bg.all_min_y[bg.image_defined] = myMandel.min_y
+		bg.all_span[bg.image_defined] = myMandel.span
+		bg.all_color_nums[bg.image_defined] = bg.color_theme_num
 		bg.image_defined++
 		zoomPathString = bg.PathImageString()
 		zoomPathLabel.SetText(zoomPathString)
 		zoomPathLabel.Refresh()
-		bg.all_min_x[bg.image_defined] = myMandel.min_x
-		bg.all_min_y[bg.image_defined] = myMandel.min_y
-		bg.all_span[bg.image_defined] = myMandel.span
 		cp.DbgPrint("zoomPathString: %d", bg.image_defined)
 	})
 	resetPathBtn := widget.NewButton("Reset", func() {
@@ -566,7 +567,7 @@ func main() {
 				bg.all_min_y[i_num],
 				bg.all_span[i_num],
 				bg.templates[bg.template_num].Images[i_num].Side_size*bg.PixelsPerUnit(),
-				bg.color_theme_num,
+				bg.all_color_nums[i_num],
 				bg.threshold,
 				cp,
 			)
