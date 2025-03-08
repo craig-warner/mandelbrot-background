@@ -69,6 +69,8 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 ## Basic
 
 ## Bug 
+* Android Save only generates zero byte files
+* Small images on preview at first
 * FIXED: Generate Background Progress (image progress string)
 * FIXED: Zoom / Pan Controll reset when selection popup is invoked
 
@@ -81,7 +83,6 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 * Math
    * Output json of span, x, y
    * Load pathfile
-   * Color for each image
    * Threshold control (DONE)
 * Templates
     * Preview (DONE)
@@ -94,10 +95,9 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
     * Mandelbrot math
 * Image Growth with Window Resize
 * Show Intermediate images
-* Allow color changes between images
+* Allow color changes between images (DONE)
 * Android
    * Test
-   * Save Test
 
 ## Spin-offs
 * Controlled Info, Error Debug Print 

@@ -4,5 +4,5 @@ Website = "https://github.com/craig-warner/mandelbrot-background"
   Icon = "assets/mandelbrot-background.png"
   Name = "Mandelbrot Background"
   ID = "com.warnerbits.mandelbrotbackground"
-  Version = "1.0.0"
+  Version = "1.1.0"
   Build = 7

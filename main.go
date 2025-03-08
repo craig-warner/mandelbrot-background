@@ -193,7 +193,8 @@ func main() {
 					// Calculate the x and y
 					pos_x := bg.templates[new_template_num].Images[i].Bg_x*units + units_half*image_size
 					pos_y := bg.templates[new_template_num].Images[i].Bg_y*units + units_half*image_size
-					image_num_str := strconv.Itoa(i)
+					// Image Numbering starts with 1 (not 0)
+					image_num_str := strconv.Itoa(i + 1)
 					image_num_text := canvas.NewText(image_num_str, theme.Color(theme.ColorNameForeground))
 					template_preview.Add(image_num_text)
 					image_num_text.Move(fyne.NewPos(float32(pos_x), float32(pos_y)))
@@ -638,9 +639,26 @@ func main() {
 		file_name_save.Show()
 	})
 	backgroundGenerationProgressText := canvas.NewText("Background Generation Progress", theme.Color(theme.ColorNameForeground))
-	backgroundProgrogressContent := container.New(layout.NewHBoxLayout())
-	backgroundProgrogressContent.Add(backgroundGenerationProgressText)
-	backgroundProgrogressContent.Add(backgroundGenerationProgressBar)
+	backgroundProgrogressContent := container.New(layout.NewHBoxLayout(), backgroundGenerationProgressText, backgroundGenerationProgressBar)
+	// Center Layout
+	/*
+		backgroundProgrogressContentHBox := container.New(layout.NewHBoxLayout())
+		backgroundProgrogressContent := container.New(layout.NewCenterLayout())
+		backgroundProgrogressContentHBox.Add(backgroundGenerationProgressText)
+		backgroundProgrogressContentHBox.Add(backgroundGenerationProgressBar)
+		backgroundProgrogressContent.Add(backgroundProgrogressContentHBox)
+	*/
+	// Center Layout - doesn't make a difference
+	/*
+		backgroundProgrogressContentHBox := container.New(layout.NewHBoxLayout())
+		backgroundProgrogressContent := container.New(layout.NewCenterLayout())
+		backgroundProgrogressContentHBox.Add(layout.NewSpacer())
+		backgroundProgrogressContentHBox.Add(backgroundGenerationProgressText)
+		backgroundProgrogressContentHBox.Add(backgroundGenerationProgressBar)
+		backgroundProgrogressContentHBox.Add(layout.NewSpacer())
+		backgroundProgrogressContent.Add(backgroundProgrogressContentHBox)
+	*/
+
 	imageGenerationProgressText := canvas.NewText("Image Generation Progress", theme.Color(theme.ColorNameForeground))
 	imageGenerationProgrogressContent := container.New(layout.NewHBoxLayout())
 	imageGenerationProgrogressContent.Add(imageGenerationProgressText)
