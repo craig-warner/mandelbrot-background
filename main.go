@@ -619,7 +619,10 @@ func main() {
 			// save file
 			//os.WriteFile(uc.URI().Path(), bmp.Encode(mbg_image), 0644)
 			//os.WriteFile(uc.URI().Path(), []byte{0xff}, 0644)
-			os.WriteFile(uc.URI().Path(), png_bytes, 0644)
+			save_err := os.WriteFile(uc.URI().Path(), png_bytes, 0644)
+			if save_err != nil {
+				cp.ErrorPrint("Error in Save: Writing")
+			}
 
 			//win.SetTitle(win.Title() + " - " + write.URI().Name())
 

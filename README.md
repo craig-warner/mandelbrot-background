@@ -38,22 +38,6 @@ sudo make install
 %sudo apt install libgl1-mesa-dev xorg-dev
 ```
 
-# Building .apk for Android Studio
-## msys-x64
-```
-fyne package -os android -appID com.example.mandelbrotbackground -ic* Image Format Selection
-```
- 
-# Installing .apk to Android Studio
-Drag Mandelbrot_Background.apk to emulator ico* Image Format Selection
-# Installaion on Ubuntu 
-## - Assumptions
- * GOHOME = /home/craigwarner
-```
-%sudo apt install libgl1-mesa-dev xorg-dev
-go run -v main.go
-```
-
 # Intalling  
 ```
 sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-background
@@ -73,6 +57,10 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 * Small images on preview at first
 * FIXED: Generate Background Progress (image progress string)
 * FIXED: Zoom / Pan Controll reset when selection popup is invoked
+* Pink needs to be changed to be mroe like what people think of as pink
+* Figure out why the images get less well formed the more you zoom in
+  * Releation to Threshold?
+  * Releation to bits per color?
 
 ## Enhancements
 * Image Format Selection
@@ -92,6 +80,7 @@ sudo /home/craigwarner/go/bin/fyne get github.com/craig-warner/mandelbrot-backgr
 * Documentation
     * Pop Up Window
     * Pointer to PBS
+        https://www.youtube.com/watch?v=qABFYiYqXSU
     * Mandelbrot math
 * Image Growth with Window Resize
 * Show Intermediate images

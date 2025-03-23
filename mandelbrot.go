@@ -272,6 +272,7 @@ func (m *Mandel) UpdateSome() {
 }
 
 func (m *Mandel) UpdateAll() {
+	m.up_to_date = false
 	for !m.up_to_date {
 		m.UpdateSome()
 	}
