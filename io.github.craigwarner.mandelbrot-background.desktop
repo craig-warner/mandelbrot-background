@@ -6,6 +6,6 @@ Comment=An application for creating computer descktop backgrounds with mandelbro
 Categories=Development;Documentation;
 Keywords=fyne;
 
-Icon=io.github.craig-warner.mandelbrot-background
+Icon=io.github.craigwarner.mandelbrot-background
 Exec=mandelbrot-background
 Terminal=false

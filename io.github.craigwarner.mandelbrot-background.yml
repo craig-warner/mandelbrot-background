@@ -1,4 +1,4 @@
-app-id: io.github.craig-warner.mandelbrot-background
+app-id: io.github.craigwarner.mandelbrot-background
 runtime: org.freedesktop.Platform
 runtime-version: '24.08'
 sdk: org.freedesktop.Sdk
@@ -26,15 +26,15 @@ build-options:
     - GOROOT=/usr/lib/sdk/golang
 
 modules:
-    - name: flatpak_demo
+    - name: mandelbrot-background
       buildsystem: simple
       build-commands:
         - $GOROOT/bin/go build -trimpath -o mandelbrot-background
-        - install -Dm00755 flatpak_demo $FLATPAK_DEST/bin/mandelbrot-background
+        - install -Dm00755 madelbrot-background $FLATPAK_DEST/bin/mandelbrot-background
         - install -Dm00644 Icon.png $FLATPAK_DEST/share/icons/hicolor/256x256/apps/$FLATPAK_ID.png
         - install -Dm00644 $FLATPAK_ID.desktop $FLATPAK_DEST/share/applications/$FLATPAK_ID.desktop
         - install -Dm00644 $FLATPAK_ID.appdata.xml $FLATPAK_DEST/share/appdata/$FLATPAK_ID.appdata.xml
       sources:
         - type: archive
-          url: "https://github.com/craig-warner/mandelbrot-background/archive/refs/tags/v1.3.0.tar.gz"
-          sha256: a9d3b920404b3b699da757a9641ebc75cf43e35515dd9879622de33c6d104b63 # Update by running sha256sum on the file linked in the url.
+          url: "https://github.com/craig-warner/mandelbrot-background/archive/refs/tags/v0.0.1.tar.gz"
+          sha256: a9304a61b504fb1a2bf632c3c8d45e938131d7d6af3bf98684137f4b9858c6ef # Update by running sha256sum on the file linked in the url.

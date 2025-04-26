@@ -1,10 +1,10 @@
 # This is just a Makefile to simplify running some of the commands mentioned in the README.
 
 build:
-	flatpak-builder --user --force-clean build-dir io.github.craig-warner.mandelbrot-background.yml
+	flatpak-builder --user --force-clean build-dir io.github.craigwarner.mandelbrot-background.yml
 
 install:
-	flatpak-builder --user --install --force-clean build-dir io.github.craig-warner.mandelbrot-background.yml
+	flatpak-builder --user --install --force-clean build-dir io.github.craigwarner.mandelbrot-background.yml
 
 run:
-	flatpak run --user io.github.craig-warner.mandelbrot-background	
+	flatpak run --user io.github.craigwarner.mandelbrot-background	

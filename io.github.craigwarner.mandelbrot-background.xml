@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.craig-warner.mandelbrot-background</id>
+  <id>io.github.craigwarner.mandelbrot-background</id>
   
   <name>mandelbrot-background</name>
   <developer_name>Craig Warner</developer_name>
