@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.craig-warner.mandelbrot-background</id>
+  
+  <name>mandelbrot-background</name>
+  <developer_name>Craig Warner</developer_name>
+  <summary>Generate a Mandelbrot fractal background</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>BSD-3-Clause</project_license>
+  
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </recommends>
+  
+  <description>
+    <p>A demo of a Fyne application packaged as a Flatpak. This project is intended to serve as a starting point to help developers package their Fyne applications using Flatpak.</p>
+  </description>
+  
+  <launchable type="desktop-id">io.github.craig-warner.mandelbrot-background.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/fyne-io/flatpak_demo/main/img/screenshot1.png</image>
+      <caption>Markdown preview</caption>
+    </screenshot>
+  </screenshots>
+
+  <!-- Override the kudos that aren't automatically added. See https://gitlab.gnome.org/GNOME/gnome-software/blob/main/doc/kudos.md.-->
+  <!-- This is not required in any way but helps software centers better understand Fyne applications. If you don't use notifications, you should remove it from the list. -->
+  <kudos>
+    <kudo>ModernToolkit</kudo>
+    <kudo>Notifications</kudo>
+  </kudos>
+
+  <url type="bugtracker">https://github.com/craig-warner/mandelbrot-background/issues</url>
+  <url type="homepage">https://github.com/craig-warner/mandelbrot-background</url>
+
+  <!-- Generate the oars rating at: https://hughsie.github.io/oars/generate.html -->
+  <content_rating type="oars-1.1" />
+  
+  <!-- Needed to satisfy https://docs.flathub.org/docs/for-app-authors/metainfo-guidelines/quality-guidelines/#has-primary-brand-colors. -->
+  <!-- The colors below are only examples taken from the Fyne logo and not official for the project in any way. --> 
+  <branding>
+    <color type="primary" scheme_preference="light">#023c8a</color>
+    <color type="primary" scheme_preference="dark">#03228a</color>
+  </branding>
+  
+  <releases>
+    <release version="1.2.0" date="2021-12-22" type="stable">
+      <description>
+        <p>Better metadata and sandbox permissions</p>
+      </description>
+      <url type="details">https://github.com/craig-warner/mandelbrot-background/releases/tag/v1.2.0</url>
+    </release>
+  </releases>
+
+</component>

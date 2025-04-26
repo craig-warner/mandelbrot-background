@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+
+Name=mandelbrot-background
+Comment=An application for creating computer descktop backgrounds with mandelbrot images
+Categories=Development;Documentation;
+Keywords=fyne;
+
+Icon=io.github.craig-warner.mandelbrot-background
+Exec=mandelbrot-background
+Terminal=false
